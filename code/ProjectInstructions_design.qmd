@@ -106,9 +106,12 @@ sap_1 <-
                                          units = "days"))) %>% 
   # assign block, irrigation system, and treatment
    mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 sample_id %in% 1:24 & sl %in% "S"  ~ "drip", 
                                  .default =  "micro-sprinkler"),
           block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
                            sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           sample_id %in% c(1:8, 25:32) & sl %in% "S"   ~ "1", 
+                           sample_id %in% c(9:16, 33:40) & sl %in% "S"   ~ "2", 
                            .default = "3"), 
           foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
                                sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
@@ -148,9 +151,12 @@ sap_2 <-
                                          units = "days"))) %>%
   # assign block, irrigation system, and treatment
    mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 sample_id %in% 1:24 & sl %in% "S"  ~ "drip", 
                                  .default =  "micro-sprinkler"),
           block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
                            sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           sample_id %in% c(1:8, 25:32) & sl %in% "S"   ~ "1", 
+                           sample_id %in% c(9:16, 33:40) & sl %in% "S"   ~ "2", 
                            .default = "3"), 
           foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
                                sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
@@ -188,9 +194,12 @@ sap_3 <-
                                          units = "days"))) %>% 
   # assign block, irrigation system, and treatment
    mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 sample_id %in% 1:24 & sl %in% "S"  ~ "drip", 
                                  .default =  "micro-sprinkler"),
           block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
                            sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           sample_id %in% c(1:8, 25:32) & sl %in% "S"   ~ "1", 
+                           sample_id %in% c(9:16, 33:40) & sl %in% "S"   ~ "2", 
                            .default = "3"), 
           foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
                                sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
@@ -198,7 +207,7 @@ sap_3 <-
                                sample_id %in% c(2,12,14,20,25,34) & sl %in% "F"  ~ "T4",
                                sample_id %in% c(3,7,16,21,29,32) & sl %in% "F"  ~ "T5",
                                sl %in% "S"  ~ "T7",
-                               .default = "T6")) %>% 
+                               .default = "T6")) %>%  
   # relocate columns
    relocate(c(block,irr_system, foliar_trt, new_old, time_num), .after = sl) %>% 
    mutate(across(c(block,irr_system, foliar_trt, new_old), as.factor)) %>% 
@@ -229,9 +238,12 @@ sap_4 <-
                                          units = "days"))) %>% 
   # assign block, irrigation system, and treatment
    mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 sample_id %in% 1:24 & sl %in% "S"  ~ "drip", 
                                  .default =  "micro-sprinkler"),
           block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
                            sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           sample_id %in% c(1:8, 25:32) & sl %in% "S"   ~ "1", 
+                           sample_id %in% c(9:16, 33:40) & sl %in% "S"   ~ "2", 
                            .default = "3"), 
           foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
                                sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
@@ -251,33 +263,145 @@ sap_4 <-
 
 Final data set  
 ```{r 2024_sap-all-samples, warning=F}
-# combined data set for all four sap sampling times (36 trees * 2 samples per tree = 72 samples per time point. So, 72 samples * 4 sampling times = 288 observations)
+# combined data set for all four sap sampling times (48 trees * 2 samples per tree = 96 samples per time point. So, 96 samples * 4 sampling times = 384 observations). However, we need to summarize the samples from `S` because there are two subsamples or trees per time point, otherwise it will be pseudoreplication. In total we need to have 336 observations. 
 
 sap_all_samples <- 
    rbind(sap_1, sap_2, sap_3, sap_4) %>%
    mutate(time = as.factor(time_num)) %>%  # time as factor 
-   rename(ammonium = "nitrogen_ammonium") %>%
+   rename(ammonium = "nitrogen_ammonium", 
+          nitrate = "nitrogen_nitrate") %>%
    relocate(time, .before = n_conv_eff) %>% 
-   mutate(across(c(boron, iron, aluminum, sugars), as.numeric)) # variables have some values <0.05, so coerce to num
-
-```
-
-
-Get the means of all response variables 
-```{r}
-sap_all_samples %>% 
-   group_by(time_num) %>% 
+   # coerce response variables <0.05 ppm to NA's
+   mutate(across(where(is.character), as.numeric)) %>% 
+   # summarize data to have 336 observations
+   group_by(block, irr_system, foliar_trt, new_old, time_num, time) %>% 
    summarise(across(where(is.numeric), \(x)  mean(x, na.rm= TRUE))) %>% 
    ungroup() %>% 
-   relocate(nitrogen, phosphorus, potassium, calcium, magnesium, sulfur, 
-            iron, manganese, boron, copper, zinc, chloride, aluminum, 
-            sodium, silica, sugars, brix, ph, ec, n_conv_eff, ammonium, kca_ratio) %>% 
-   pivot_longer(nitrogen:kca_ratio) %>% 
-   mutate(time_num = paste0("DAF", "_", time_num )) %>% 
-   pivot_wider(names_from = time_num, values_from = value) %>% 
-   gt() %>% 
-   fmt_number( columns = everything(), decimals = 1)
+   # relocate columns for better organization
+   relocate(nitrogen, ammonium, nitrate, n_conv_eff, phosphorus, potassium, calcium, kca_ratio, magnesium, sulfur, 
+            iron, manganese, boron, copper, zinc, chloride, aluminum, sodium, silica, sugars, brix, ph, ec, .after = time)
+
+
 ```
+
+## 2) Exploratory data analyses (EDA)
+
+Let's confirm that:     
+
+- Number of blocks: 3     
+- Number o treatments: 7 foliar sprays (T1, T2, T3, T4, T5, T6, T7) x 2 irrigation systems (drip and micro-sprinkler) X 2 tissues (new and old) = 28   
+- Number of observations: 3 x 28 = 84 observations per sample point (4 time points x 84 = 336 observations)  
+
+```{r}
+sap_all_samples %>% psych::describe() 
+```
+We might consider to exclude nitrate, cobalt, molybdenum, nickel, and selenium from the analysis because they have 253, 317, 307, 150, and 297 out of 336 observations, respectively. Basically, these variables have values <0.05 ppm.  
+
+```{r glimpse(), eval=F}
+sap_all_samples %>% glimpse()
+```
+
+Density plots of macronutrients, except Potassium
+```{r}
+#install.packages("ggridges")
+library(ggridges)
+
+sap_all_samples %>% 
+   #pivot longer so I can plot
+   pivot_longer(where(is.numeric)) %>% 
+   mutate(across(c(name), as.factor)) %>% 
+   # plot this variables separately 
+   filter(!c(name %in% c("time_num", "n_conv_eff"))) %>%
+   filter(c(name %in% c("nitrogen", "ammonium", "nitrate", "phosphorus", "calcium", "magnesium", "kca_ratio", "sulfur", "chloride"))) %>% 
+   #plot 
+   ggplot(., aes(x = value, y = name, fill = stat((x)))) +
+   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) + # for displaying a certain threshold
+   labs(x = "ppm", 
+        y = "Leaf mineral nutrients") +
+   scale_fill_viridis_c(option = "D") +
+   theme_minimal() +
+   theme(legend.position = "none") 
+```
+
+Density plots of micronutrients and trace elements 
+```{r}
+#install.packages("ggridges")
+library(ggridges)
+
+sap_all_samples %>% 
+   #pivot longer so I can plot
+   pivot_longer(where(is.numeric)) %>% 
+   mutate(across(c(name), as.factor)) %>% 
+   # plot this variables separately 
+   filter(!c(name %in% c("time_num", "n_conv_eff"))) %>%
+   filter(!c(name %in% c("nitrogen", "ammonium", "nitrate", "phosphorus", "potassium", "calcium", "magnesium", "kca_ratio", "sulfur", "chloride"))) %>% 
+   #plot 
+   ggplot(., aes(x = value, y = name, fill = stat((x)))) +
+   geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) + # for displaying a certain threshold
+   labs(x = "ppm", 
+        y = "Leaf mineral nutrients") +
+   scale_fill_viridis_c(option = "D") +
+   theme_minimal() +
+   theme(legend.position = "none") 
+```
+
+
+Boxplots of Irrigation system within each block 
+```{r}
+sap_all_samples %>% 
+   #pivot longer so I can plot
+   pivot_longer(where(is.numeric)) %>% 
+   mutate(across(c(name), as.factor)) %>% 
+   filter(!c(name %in% c("time_num"))) %>%
+   #plot 
+   ggplot(aes(x= block, y = value, fill= irr_system)) + 
+   geom_boxplot(position = position_dodge(width = 0.75), alpha =0.75) + 
+   geom_point(position = position_dodge(width = 0.75)) + 
+   geom_rug() +
+   facet_wrap(.~name, scales= "free") +
+   scale_fill_viridis_d() + 
+   theme_bw()
+```
+
+Boxplots of foliar treatment within each irrigation system 
+```{r}
+sap_all_samples %>% 
+   #pivot longer so I can plot
+   pivot_longer(where(is.numeric)) %>% 
+   mutate(across(c(name), as.factor)) %>% 
+   filter(!c(name %in% c("time_num"))) %>%
+   #plot 
+   ggplot(aes(x= irr_system, y = value, fill= foliar_trt)) + 
+   geom_boxplot(position = position_dodge(width = 0.75), alpha =0.75) + 
+   #geom_point(position = position_dodge(width = 0.75)) + 
+   geom_rug() +
+   facet_wrap(.~name, scales= "free") +
+   scale_fill_viridis_d() + 
+   theme_bw()
+```
+
+Boxplots of new/old within foliar treatment 
+```{r}
+sap_all_samples %>% 
+   #pivot longer so I can plot
+   pivot_longer(where(is.numeric)) %>% 
+   mutate(across(c(name), as.factor)) %>% 
+   filter(!c(name %in% c("time_num"))) %>%
+   #plot 
+   ggplot(aes(x= foliar_trt, y = value, fill= new_old)) + 
+   geom_boxplot(position = position_dodge(width = 0.75), alpha =0.75) + 
+   #geom_point(position = position_dodge(width = 0.75)) + 
+   geom_rug() +
+   facet_wrap(.~name, scales= "free") +
+   scale_fill_viridis_d() + 
+   theme_bw()
+```
+
+
+```{r view(), eval=F, echo=F}
+sap_all_samples %>% View()
+```
+
 
 
 # Team work in GitHub  
