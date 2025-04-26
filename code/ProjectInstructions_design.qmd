@@ -413,16 +413,16 @@ Define the correlation structures to be used in the model and select the respons
 # Define a list of correlation structures
 cor_structures <- list(
   none = NULL,
-  compSymm = corCompSymm(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  compSymm = corCompSymm(form = ~ time_num ),
   symm = corSymm(),
-  #ar1 = corAR1(form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  car1 = corCAR1(form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  arma = corARMA(p = 1, q = 1, form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  exp = corExp(form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  gaus = corGaus(form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  lin = corLin(form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  ratio = corRatio(form = ~ time_num | block/irr_system/foliar_trt/new_old),
-  spher = corSpher(form = ~ time_num | block/irr_system/foliar_trt/new_old)
+  #ar1 = corAR1(form = ~ time_num ),
+  car1 = corCAR1(form = ~ time_num ),
+  arma = corARMA(p = 1, q = 1),
+  exp = corExp(form = ~ time_num ),
+  gaus = corGaus(form = ~ time_num ),
+  lin = corLin(form = ~ time_num ),
+  ratio = corRatio(form = ~ time_num ),
+  spher = corSpher(form = ~ time_num )
 )
 
 response_vars <- 
@@ -571,6 +571,82 @@ tbl <- reduce(
 tbl
 ```
 
+```{r}
+library(broom.mixed)  # for augment()
+library(ggplot2)
+library(purrr)
+library(patchwork)
+
+# Discard NULL models from best_models
+best_models_clean <- best_models %>% discard(is.null)
+
+# 1. Make residuals and standardized residuals for each model
+residuals_df <- 
+  best_models %>%
+  discard(is.null) %>%
+  map(~ augment(.x) %>% 
+        mutate(.stdresid = resid(.x, type = "pearson", scaled = TRUE))
+      )
+
+# 2. Plot random effects QQ-plots for each random term
+# We'll define a function to do that per model
+plot_random_effects <- function(model) {
+  raneffects <- ranef(model)
+  
+  map(raneffects, ~ 
+    ggplot(.x, aes(sample = `(Intercept)`)) +
+      stat_qq(shape = 21, fill = "purple", size = 3, alpha = 0.7) +
+      stat_qq_line() +
+      labs(x = "Theoretical quantile", y = "Sample quantile") +
+      theme_bw()
+  )
+}
+
+# 3. Plot residuals (fitted vs residuals) and QQ plot for residuals
+plot_residuals <- function(resid_df) {
+  fitted_vs_resid <- 
+    ggplot(resid_df, aes(.fitted, .stdresid)) +
+      geom_hline(yintercept = 0, color = "red") +
+      geom_point(shape = 21, fill = "purple", size = 3, alpha = 0.7) +
+      geom_smooth(se = FALSE) +
+      geom_hline(yintercept = c(-3, 3), linetype = "dashed", color = "red") +
+      theme_bw() +
+      labs(x = "Fitted values", y = "Standardized residuals")
+  
+  resid_qq <- 
+    ggplot(resid_df, aes(sample = .stdresid)) +
+      stat_qq(shape = 21, fill = "purple", size = 3, alpha = 0.7) +
+      stat_qq_line() +
+      theme_bw() +
+      labs(x = "Theoretical quantile", y = "Sample quantile")
+  
+  list(fitted_vs_resid = fitted_vs_resid, resid_qq = resid_qq)
+}
+
+
+# 4. Now map over everything
+diagnostic_plots <- map2(
+  best_models_clean,
+  residuals_df,
+  ~ {
+    randef_plots <- plot_random_effects(.x)
+    resid_plots <- plot_residuals(.y)
+    
+    # arrange all plots using patchwork
+    (randef_plots[[1]] + randef_plots[[2]] + randef_plots[[3]] + randef_plots[[4]]) / 
+    (resid_plots$fitted_vs_resid + resid_plots$resid_qq)
+  }
+)
+
+# 5. Store in a named list (response variables as names)
+names(diagnostic_plots) <- names(best_models_clean)
+
+# Now you can easily access, for example:
+diagnostic_plots$phosphorus
+diagnostic_plots$potassium
+
+
+```
 
 
 
