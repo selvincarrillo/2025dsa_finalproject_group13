@@ -8,7 +8,10 @@ format:
     toc: true
     number-sections: true
     theme: cerulean
+editor_options: 
+  chunk_output_type: console
 ---
+
 
 # Instructions  
 This file contains both the **instructions** for the mid-term project and placeholders for your code. You are required to use this file to produce code, output, and answers to the questions below.  
@@ -49,6 +52,233 @@ Make sure to run a model that reflects your study design. Even if your study des
 Before each chunk, describe the steps being performed in that chunk. For example, "Here I will load the data".  
 
 If a chunk produces output, like printing a data frame, statistical summary, a plot, ANOVA table, etc., make sure to write text interpreting what you see and how you can/will use that information to move forward to the next steps in the workflow.  
+
+```{r libraries, echo=FALSE}
+# libraries 
+library(kableExtra)
+library(latexpdf)
+library(readxl)
+library(janitor)
+library(tinytex)
+library(patchwork)
+library(shiny)
+library(gridExtra)
+library(car) # Anova function 
+library(lme4) # model fitting 
+library(lmerTest) # p-values
+library(broom)# residuals extraction 
+library(emmeans) # mean extraction 
+library(multcomp) # pairwise comparison 
+library(nlme) # repeated measures correlation structure
+
+library(tidyverse)
+library(gt) # great tables 
+library(plotly)
+library(here)
+```
+
+
+## 1) Read in and clean data 
+
+Let's read in the datasets coming from the lab where each dataset should have 96 observations coming from four different time points. At the end, combine the datasets into one by assigning their respective time point, block, and treatments.   
+First sampling
+```{r 2024_first-sampling}
+# read in data set from first sampling
+sap_1 <- 
+   read_csv(here("data/2024_first_sap_sampling_0423241049FL.csv")) %>% 
+  # select columns I do not need
+   dplyr::select(!c(1:11, nal_sample_id, date_sampled, time_sampled, sample_type, 
+                    plant_type, variety, growth_stage, vigor)) %>% 
+   clean_names() %>% 
+  # separate column client_sample_id
+   separate(client_sample_id, into = c("sample_id", "new_old"), sep = " ") %>% 
+   mutate(across(c(sample_id), as.numeric)) %>%
+  # arrange base on sample_id
+   arrange(sample_id) %>% 
+  # correct a mislabeled sample
+   mutate(sample_location = case_when(sample_id == 37 ~ "S", 
+                                      TRUE ~ sample_location)) %>%  # Sample 37 corresponds to soil 100% rate
+  rename(n_conv_eff = nitrogen_conversion_efficiency, 
+         sl = sample_location) %>% 
+  # calculate days after blooming.    # first sampling April 18-19, 2024
+  mutate(time_num = as.numeric(difftime(as.Date("2024-04-19"), 
+                                         as.Date("2024-03-10"), 
+                                         units = "days"))) %>% 
+  # assign block, irrigation system, and treatment
+   mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 .default =  "micro-sprinkler"),
+          block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
+                           sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           .default = "3"), 
+          foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
+                               sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
+                               sample_id %in% c(1,11,17,19,30,36) & sl %in% "F"  ~ "T3",
+                               sample_id %in% c(2,12,14,20,25,34) & sl %in% "F"  ~ "T4",
+                               sample_id %in% c(3,7,16,21,29,32) & sl %in% "F"  ~ "T5",
+                               sl %in% "S"  ~ "T7",
+                               .default = "T6")) %>% 
+  # relocate columns
+   relocate(c(block,irr_system, foliar_trt, new_old, time_num), .after = sl) %>% 
+   mutate(across(c(block,irr_system, foliar_trt, new_old), as.factor)) %>% 
+   dplyr:: select(!c(sample_id, sl)) 
+
+
+```
+
+Second sampling   
+```{r 2024_second-sampling}
+# read in data set from second sampling
+sap_2 <- 
+   read_csv(here("data/2024_second_sap_sampling_0522241201FL.csv")) %>% 
+  # select columns I do not need
+   dplyr::select(!c(1:11, nal_sample_id, date_sampled, time_sampled, sample_type, 
+                    plant_type, variety, growth_stage, vigor)) %>% 
+   clean_names() %>% 
+  # separate column client_sample_id
+   separate(client_sample_id, into = c("sample_id", "new_old"), sep = " ") %>% 
+   mutate(across(c(sample_id), as.numeric)) %>%
+  # arrange base on sample_id
+   arrange(sample_id) %>% 
+
+  rename(n_conv_eff = nitrogen_conversion_efficiency, 
+         sl = sample_location) %>% 
+  # calculate days after blooming.  # second sampling May 20-21, 2024
+   mutate(time_num = as.numeric(difftime(as.Date("2024-05-21"), # days after bloom
+                                         as.Date("2024-03-10"), 
+                                         units = "days"))) %>%
+  # assign block, irrigation system, and treatment
+   mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 .default =  "micro-sprinkler"),
+          block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
+                           sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           .default = "3"), 
+          foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
+                               sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
+                               sample_id %in% c(1,11,17,19,30,36) & sl %in% "F"  ~ "T3",
+                               sample_id %in% c(2,12,14,20,25,34) & sl %in% "F"  ~ "T4",
+                               sample_id %in% c(3,7,16,21,29,32) & sl %in% "F"  ~ "T5",
+                               sl %in% "S"  ~ "T7",
+                               .default = "T6")) %>% 
+  # relocate columns
+   relocate(c(block,irr_system, foliar_trt, new_old, time_num), .after = sl) %>% 
+   mutate(across(c(block,irr_system, foliar_trt, new_old), as.factor)) %>% 
+   dplyr:: select(!c(sample_id, sl)) 
+```
+
+Third sampling   
+```{r 2024_third-sampling}
+# read in data set from third sampling
+sap_3 <- 
+   read_csv(here("data/2024_third_sap_sampling_0605241210FL.csv")) %>% 
+  # select columns I do not need
+   dplyr::select(!c(1:11, nal_sample_id, date_sampled, time_sampled, sample_type, 
+                    plant_type, variety, growth_stage, vigor)) %>% 
+   clean_names() %>% 
+  # separate column client_sample_id
+   separate(client_sample_id, into = c("sample_id", "new_old"), sep = " ") %>% 
+   mutate(across(c(sample_id), as.numeric)) %>%
+  # arrange base on sample_id
+   arrange(sample_id) %>% 
+
+  rename(n_conv_eff = nitrogen_conversion_efficiency, 
+         sl = sample_location) %>% 
+  # calculate days after blooming.  # third sampling June 3 -4 
+  mutate(time_num = as.numeric(difftime(as.Date("2024-06-04"), # days after bloom
+                                         as.Date("2024-03-10"), 
+                                         units = "days"))) %>% 
+  # assign block, irrigation system, and treatment
+   mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 .default =  "micro-sprinkler"),
+          block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
+                           sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           .default = "3"), 
+          foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
+                               sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
+                               sample_id %in% c(1,11,17,19,30,36) & sl %in% "F"  ~ "T3",
+                               sample_id %in% c(2,12,14,20,25,34) & sl %in% "F"  ~ "T4",
+                               sample_id %in% c(3,7,16,21,29,32) & sl %in% "F"  ~ "T5",
+                               sl %in% "S"  ~ "T7",
+                               .default = "T6")) %>% 
+  # relocate columns
+   relocate(c(block,irr_system, foliar_trt, new_old, time_num), .after = sl) %>% 
+   mutate(across(c(block,irr_system, foliar_trt, new_old), as.factor)) %>% 
+   dplyr:: select(!c(sample_id, sl)) 
+
+```
+
+Fourth sampling  
+```{r 2024_fourth-sampling}
+# read in data set from fourth sampling
+sap_4 <- 
+   read_csv(here("data/2024_fourth_sap_sampling_0619241330FL.csv")) %>% 
+    # select columns I do not need
+   dplyr::select(!c(1:11, nal_sample_id, date_sampled, time_sampled, sample_type, 
+                    plant_type, variety, growth_stage, vigor)) %>% 
+   clean_names() %>% 
+  # separate column client_sample_id
+   separate(client_sample_id, into = c("sample_id", "new_old"), sep = " ") %>% 
+   mutate(across(c(sample_id), as.numeric)) %>%
+  # arrange base on sample_id
+   arrange(sample_id) %>% 
+
+  rename(n_conv_eff = nitrogen_conversion_efficiency, 
+         sl = sample_location) %>% 
+  # calculate days after blooming.  # fourth samplin June 17-18
+   mutate(time_num = as.numeric(difftime(as.Date("2024-06-18"), # days after bloom
+                                         as.Date("2024-03-10"), 
+                                         units = "days"))) %>% 
+  # assign block, irrigation system, and treatment
+   mutate(irr_system = case_when(sample_id %in% 1:18 & sl %in% "F"  ~ "drip", 
+                                 .default =  "micro-sprinkler"),
+          block = case_when(sample_id %in% c(1:6, 19:24) & sl %in% "F"   ~ "1", 
+                           sample_id %in% c(7:12, 25:30) & sl %in% "F"   ~ "2", 
+                           .default = "3"), 
+          foliar_trt = case_when(sample_id %in% c(5,9,18,23,27,31) & sl %in% "F"   ~ "T1", 
+                               sample_id %in% c(6,8,13,22,28,33) & sl %in% "F"  ~ "T2",
+                               sample_id %in% c(1,11,17,19,30,36) & sl %in% "F"  ~ "T3",
+                               sample_id %in% c(2,12,14,20,25,34) & sl %in% "F"  ~ "T4",
+                               sample_id %in% c(3,7,16,21,29,32) & sl %in% "F"  ~ "T5",
+                               sl %in% "S"  ~ "T7",
+                               .default = "T6")) %>% 
+  # relocate columns
+   relocate(c(block,irr_system, foliar_trt, new_old, time_num), .after = sl) %>% 
+   mutate(across(c(block,irr_system, foliar_trt, new_old), as.factor)) %>% 
+   dplyr:: select(!c(sample_id, sl)) 
+
+
+```
+
+
+Final data set  
+```{r 2024_sap-all-samples, warning=F}
+# combined data set for all four sap sampling times (36 trees * 2 samples per tree = 72 samples per time point. So, 72 samples * 4 sampling times = 288 observations)
+
+sap_all_samples <- 
+   rbind(sap_1, sap_2, sap_3, sap_4) %>%
+   mutate(time = as.factor(time_num)) %>%  # time as factor 
+   rename(ammonium = "nitrogen_ammonium") %>%
+   relocate(time, .before = n_conv_eff) %>% 
+   mutate(across(c(boron, iron, aluminum, sugars), as.numeric)) # variables have some values <0.05, so coerce to num
+
+```
+
+
+Get the means of all response variables 
+```{r}
+sap_all_samples %>% 
+   group_by(time_num) %>% 
+   summarise(across(where(is.numeric), \(x)  mean(x, na.rm= TRUE))) %>% 
+   ungroup() %>% 
+   relocate(nitrogen, phosphorus, potassium, calcium, magnesium, sulfur, 
+            iron, manganese, boron, copper, zinc, chloride, aluminum, 
+            sodium, silica, sugars, brix, ph, ec, n_conv_eff, ammonium, kca_ratio) %>% 
+   pivot_longer(nitrogen:kca_ratio) %>% 
+   mutate(time_num = paste0("DAF", "_", time_num )) %>% 
+   pivot_wider(names_from = time_num, values_from = value) %>% 
+   gt() %>% 
+   fmt_number( columns = everything(), decimals = 1)
+```
+
 
 # Team work in GitHub  
 Whether you are working with your future-self or as duos, make sure to stage, commit, and push after finishing each of the sub-sections above. When committing, write commit messages that are short and descriptive (e.g., finished wrangling).  
