@@ -302,8 +302,7 @@ sap_all_samples %>% glimpse()
 ```
 
 Density plots of macronutrients, except Potassium
-```{r}
-#install.packages("ggridges")
+```{r density plot macro}
 library(ggridges)
 
 sap_all_samples %>% 
@@ -324,8 +323,7 @@ sap_all_samples %>%
 ```
 
 Density plots of micronutrients and trace elements 
-```{r}
-#install.packages("ggridges")
+```{r density plot micro}
 library(ggridges)
 
 sap_all_samples %>% 
@@ -382,7 +380,7 @@ sap_all_samples %>%
 
 Boxplots of new/old within foliar treatment 
 ```{r}
-sap_all_samples %>% 
+sap_all_samples %>% head(2)
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
    mutate(across(c(name), as.factor)) %>% 
@@ -401,6 +399,178 @@ sap_all_samples %>%
 ```{r view(), eval=F, echo=F}
 sap_all_samples %>% View()
 ```
+
+## 3) Statistical model fitting
+Let's remember that `lmer()` function does not allow to specify correlation structures while `lme()` allows to fit spatial and temporal correlation structures.
+
+Because our data includes a time variable, it should be analyzed as a **split-split-plot repeated measures**.  
+
+- For fixed effects, let's remember that our whole-plot is irrigation system, split-plot is foliar treatment, spli-split plot is new-old leaves, and time is our repeated measures.  
+- For random effects the nesting goes from biggest to lowest: replicate/whole-plot/split-plot/split-split-plot. Thus, time_num is considered to be nested within old_new leaves.  
+
+Define the correlation structures to be used in the model and select the response variables to use
+```{r}
+# Define a list of correlation structures
+cor_structures <- list(
+  none = NULL,
+  compSymm = corCompSymm(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  symm = corSymm(),
+  #ar1 = corAR1(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  car1 = corCAR1(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  arma = corARMA(p = 1, q = 1, form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  exp = corExp(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  gaus = corGaus(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  lin = corLin(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  ratio = corRatio(form = ~ time_num | block/irr_system/foliar_trt/new_old),
+  spher = corSpher(form = ~ time_num | block/irr_system/foliar_trt/new_old)
+)
+
+response_vars <- 
+   sap_all_samples %>% 
+   select(!c(time_num, nitrate, cobalt, molybdenum, nickel, selenium)) %>% 
+  select(where(is.numeric)) %>% 
+  names()
+
+
+```
+
+Create a function to fit the model with a given correlation structure and response variable. The function will return the AIC of the fitted model.
+```{r}
+options(contrasts = c("contr.sum", "contr.poly"))
+
+# Function to fit model 
+fit_model <- function(response, cor_struct) {
+  formula <- as.formula(paste(response, "~ irr_system * foliar_trt * new_old * time"))
+  
+  tryCatch(
+    lme(
+      formula,
+      random = ~1 | block/irr_system/foliar_trt/new_old,
+      correlation = cor_struct,
+      data = sap_all_samples,
+      na.action = na.exclude,
+      control = lmeControl(opt = "optim")
+    ),
+    error = function(e) NULL
+  )
+}
+
+# Now map over correlation structures and response variables
+results <- map(cor_structures, function(cor_struct) {
+  map(response_vars, function(response) {
+    model <- fit_model(response, cor_struct)
+    if (!is.null(model)) {
+      AIC(model)
+    } else {
+      NA_real_
+    }
+  }) %>% set_names(response_vars)
+})
+
+```
+
+Create a table of AIC values for each response variable and correlation structure. 
+```{r}
+# Make a tidy table
+aic_table <- results %>%
+  map_dfr(~ as_tibble(.x), .id = "cor_structure")
+
+# View the AIC table
+aic_table %>% View()
+
+```
+
+Select the best model for each response variable based on AIC values. 
+```{r}
+best_model_table <- 
+   aic_table %>%
+  pivot_longer(
+    cols = -cor_structure, 
+    names_to = "response", 
+    values_to = "AIC"
+  ) %>%
+  group_by(response) %>%
+  slice_min(AIC, with_ties = FALSE) %>%
+  ungroup() %>%
+  select(response, cor_structure, AIC)
+
+best_model_table %>% gt()
+
+```
+
+Based on the best correlation structure for each response variable, fit the final models. 
+```{r}
+# Make it easier to access
+best_model_list <- best_model_table %>% deframe() # named vector: response -> cor_structure
+
+# Now fit the models
+best_models <- map2(
+  names(best_model_list),    # responses
+  best_model_list,           # best correlation structure names
+  ~ {
+    formula <- as.formula(paste(.x, "~ irr_system * foliar_trt * new_old * time"))
+    cor_struct <- cor_structures[[.y]]  # get the correct correlation object
+
+    tryCatch(
+      lme(
+        formula,
+        random = ~ 1 | block/irr_system/foliar_trt/new_old,
+        correlation = cor_struct,
+        data = sap_all_samples,
+        na.action = na.exclude,
+        control = lmeControl(opt = "optim")
+      ),
+      error = function(e) NULL
+    )
+  }
+)
+
+# Name the list by response
+names(best_models) <- names(best_model_list)
+
+# Create a table of p-values
+pval_table <- 
+  best_models %>% 
+   discard(is.null) %>%  # <-- remove NULL models first
+  map(~ .x %>% Anova(type = 3) %>% tidy()) %>% # get Anova output and tidy
+  map(~ .x %>% clean_names() %>% select(term, p_value)) %>% # clean names
+  bind_rows(.id = "response") %>% # make a big table
+  pivot_wider(names_from = response, values_from = p_value) %>% # reshape
+  filter(term != "(Intercept)")  # remove intercept
+
+
+
+```
+
+Highlight in bold the significant p-values (p ≤ 0.05) in the table.
+```{r}
+# Start with basic table
+tbl <- pval_table %>%
+  gt() %>%
+  cols_label(term = "Factor") %>%
+  fmt_number(columns = everything(), decimals = 3) %>%
+  tab_header(title = "", subtitle = "P-value Table") %>%
+  tab_source_note("P ≤ 0.05 indicates significance. Significant values are in bold.") %>%
+  tab_options(heading.align = "left", table_body.hlines.width = px(0)) %>%
+  tab_style(
+    style = cell_fill(color = "lightgray"),
+    locations = cells_body(rows = seq(1, nrow(pval_table), 2))
+  )
+
+# Now add bold style separately for each p-value column
+tbl <- reduce(
+  names(pval_table)[-1],  # all p-value columns (skip 'term')
+  .init = tbl,
+  .f = ~ tab_style(
+    .x,
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = .y, rows = .data[[.y]] < 0.05)
+  )
+)
+
+tbl
+```
+
 
 
 
