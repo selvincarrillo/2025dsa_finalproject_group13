@@ -380,7 +380,7 @@ sap_all_samples %>%
 
 Boxplots of new/old within foliar treatment 
 ```{r}
-sap_all_samples %>% head(2)
+sap_all_samples %>% 
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
    mutate(across(c(name), as.factor)) %>% 
@@ -528,6 +528,11 @@ best_models <- map2(
 # Name the list by response
 names(best_models) <- names(best_model_list)
 
+
+```
+
+### a) Table of p-values
+```{r}
 # Create a table of p-values
 pval_table <- 
   best_models %>% 
@@ -540,10 +545,6 @@ pval_table <-
 
 
 
-```
-
-Highlight in bold the significant p-values (p ≤ 0.05) in the table.
-```{r}
 # Start with basic table
 tbl <- pval_table %>%
   gt() %>%
@@ -557,7 +558,7 @@ tbl <- pval_table %>%
     locations = cells_body(rows = seq(1, nrow(pval_table), 2))
   )
 
-# Now add bold style separately for each p-value column
+# highlight in bold the significant p-values (p ≤ 0.05) in the table.
 tbl <- reduce(
   names(pval_table)[-1],  # all p-value columns (skip 'term')
   .init = tbl,
@@ -571,14 +572,13 @@ tbl <- reduce(
 tbl
 ```
 
+### a) model assumptions
 ```{r}
 library(broom.mixed)  # for augment()
-library(ggplot2)
-library(purrr)
-library(patchwork)
 
 # Discard NULL models from best_models
 best_models_clean <- best_models %>% discard(is.null)
+
 
 # 1. Make residuals and standardized residuals for each model
 residuals_df <- 
@@ -589,7 +589,7 @@ residuals_df <-
       )
 
 # 2. Plot random effects QQ-plots for each random term
-# We'll define a function to do that per model
+
 plot_random_effects <- function(model) {
   raneffects <- ranef(model)
   
@@ -624,30 +624,744 @@ plot_residuals <- function(resid_df) {
 }
 
 
-# 4. Now map over everything
+# 4. map over everything
 diagnostic_plots <- map2(
-  best_models_clean,
+  names(best_models_clean),  # use the response names directly
   residuals_df,
   ~ {
-    randef_plots <- plot_random_effects(.x)
+    response_name <- .x  # .x is the name (e.g., "potassium")
+    model <- best_models_clean[[response_name]]
+    
+    randef_plots <- plot_random_effects(model)
     resid_plots <- plot_residuals(.y)
     
-    # arrange all plots using patchwork
-    (randef_plots[[1]] + randef_plots[[2]] + randef_plots[[3]] + randef_plots[[4]]) / 
-    (resid_plots$fitted_vs_resid + resid_plots$resid_qq)
+    # combine the 6 plots
+    full_plot <- (randef_plots[[1]] + randef_plots[[2]] + randef_plots[[3]] + randef_plots[[4]]) / 
+                 (resid_plots$fitted_vs_resid + resid_plots$resid_qq)
+    
+    # add a big title using patchwork
+    full_plot + plot_annotation(title = paste("Diagnostic Plots for", response_name))
   }
 )
 
-# 5. Store in a named list (response variables as names)
+# assign plot names
 names(diagnostic_plots) <- names(best_models_clean)
 
-# Now you can easily access, for example:
-diagnostic_plots$phosphorus
-diagnostic_plots$potassium
+diagnostic_plots$brix
 
 
 ```
+For the model assumptions, we may have problems with N conversion efficiency, sodium, silica, pH, boron,  
 
+
+### b) post hoc tests 
+
+We are interested in those interactions with foliar treatment and time, so we will run post hoc tests on those models. First, we will start from higher order interactions. 
+
+#### Foliar treatment, new/old, and time
+
+Sodium 
+```{r}
+na <- 
+   best_models$sodium %>% 
+   #estimated marginal means (a.k.a. least-squares means) 
+   emmeans(~  foliar_trt | new_old | time) %>% # compares foliar_trt within new_old at each time point (too much time to run interaction too)
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group))
+   
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = sodium, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = sodium, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = na, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Na (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~new_old) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.8))
+```
+Nanocellulose may be causeing sodim increase because there are higher values for T2. 
+
+
+Sugars 
+```{r}
+sug <- 
+   best_models$sugars %>% 
+   #estimated marginal means (a.k.a. least-squares means) 
+   emmeans(~  foliar_trt | new_old | time) %>% # compares foliar_trt within new_old at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group))
+   
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = sugars, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = sugars, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = sug, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Sugars ", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~new_old) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.8))
+```
+We have difference within each time point in the new leaves only. For T4, T5, T6 at 72 DAB, the low sugars might be that they are not being translocated to the leaves.
+
+#### Irrigation system, foliar treatment, and time  
+Boron 
+```{r}
+#estimated marginal means (a.k.a. least-squares means) 
+b_sym_cld <- 
+   best_models$boron %>% 
+   emmeans(~  foliar_trt | irr_system | time) %>% # tests 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group))
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = boron, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = boron, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = b_sym_cld, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "B (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.7))
+```
+
+
+Copper 
+```{r}
+#estimated marginal means (a.k.a. least-squares means) 
+cu <- 
+   best_models$copper %>% 
+   emmeans(~  foliar_trt | irr_system | time) %>% # compares new_old at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = copper, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = copper, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = cu, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Cu (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.8))
+```
+
+
+Magnesium 
+```{r}
+mg <- 
+   best_models$magnesium %>% 
+   emmeans(~  foliar_trt |irr_system | time) %>% # compares foliar_trt within irrigation at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = magnesium, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = magnesium, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = mg, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Mg (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.6,0.8))
+```
+Mainly differences in the drip irrigation. 
+
+
+Manganese 
+```{r}
+mn <- 
+   best_models$manganese %>% 
+   emmeans(~  foliar_trt |irr_system | time) %>% # compares foliar_trt within irrigation at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = manganese, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = manganese, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = mn, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Mn (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.6,0.8))
+```
+Seems like most of the foliar sprays were lower in Mn compared to control and T7 (soil fertilization), at least at 86 DAB in the drip irrigation. 
+
+#### Foliar treatment and time  
+Ammonium 
+```{r}
+#estimated marginal means (a.k.a. least-squares means) 
+nh4 <- 
+   best_models$ammonium  %>% 
+   emmeans(~  foliar_trt | time ) %>% # compares foliar_trt at each time point
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = ammonium, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = ammonium, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+               alpha = 0.8, , 
+              position = position_dodge(width = 0.7)) + 
+   #adding letters 
+   geom_label(data = nh4, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -6) + 
+   labs(x = "Days After Blooming", 
+        y = "NH4 (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.9))
+```
+
+Calcium 
+```{r}
+#estimated marginal means (a.k.a. least-squares means) 
+ca <- 
+   best_models$calcium %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = calcium, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = calcium, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = ca, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Ca (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.7,0.8))
+```
+
+Electrical conductivity 
+```{r}
+ec <- 
+   best_models$ec %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = ec, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = ec, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = ec, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Electrical conductivity ()", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.7,0.8))
+```
+
+Iron
+```{r}
+fe <- 
+   best_models$iron %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = iron, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = iron, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = fe, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Fe (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.7,0.8))
+```
+
+Potassium/Calcium ratio
+```{r}
+kca <- 
+   best_models$kca_ratio %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = kca_ratio, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = kca_ratio, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = kca, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "K/Ca ratio ", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.8))
+```
+
+Nitrogen 
+```{r}
+n <- 
+   best_models$nitrogen %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = nitrogen, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = nitrogen, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = n, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "N (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.8))
+```
+
+pH
+```{r}
+ph <- 
+   best_models$ph %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = ph, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = ph, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = ph, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "pH (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.6,0.2))
+```
+
+Phosphorus
+```{r}
+p <- 
+   best_models$phosphorus %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = phosphorus, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = phosphorus, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = p, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "P (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.9))
+```
+
+Potassium 
+```{r}
+k <- 
+   best_models$potassium %>% 
+   emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = potassium, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = potassium, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = k, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "K (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.4,0.9))
+```
+
+Silica 
+```{r}
+#estimated marginal means (a.k.a. least-squares means) 
+si <- 
+   best_models$silica %>% 
+   emmeans(~  foliar_trt|irr_system| time) %>% #compares foliar_trt within each irrigation 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = silica, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = silica, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = si, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Si (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.7,0.8))
+```
+
+Sulfur 
+```{r}
+s <- 
+   best_models$sulfur %>% 
+   emmeans(~  foliar_trt | time) %>% # 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = sulfur, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = sulfur, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = s, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "S (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.6,0.8))
+```
+
+Sulfur 
+```{r}
+zn <- 
+   best_models$zinc %>% 
+   emmeans(~  foliar_trt | time) %>% # 
+   cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
+   as.data.frame() %>% 
+   mutate(letter = trimws(.group)) 
+
+ggplot(mapping = aes(fill = time)) +
+   #raw data and boxplots
+   geom_boxplot(data = sap_all_samples, 
+                aes(x = time, y = zinc, fill = foliar_trt),
+                width = 0.5,
+                alpha = 0.8, 
+                position = position_dodge(width = 0.7)) + 
+   geom_point(data = sap_all_samples, 
+               aes(x = time, y = zinc, fill = foliar_trt, group = foliar_trt), 
+               shape = 21, 
+               #size =3, 
+              position = position_dodge(width = 0.7),
+               alpha = 0.8) + 
+   #adding letters 
+   geom_label(data = zn, 
+              aes(x = time, y = emmean, label = letter, group = foliar_trt), 
+              fill = "white", 
+              position = position_dodge(width = 0.7), 
+               vjust = -3) + 
+   labs(x = "Days after blooming", 
+        y = "Zn (ppm)", 
+        fill = "Foliar") +
+   scale_fill_viridis_d() + 
+   #facet_grid(.~irr_system) + 
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         legend.position = c(0.6,0.8))
+```
+
+In general, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, pre- and post-harvest.
 
 
 # Team work in GitHub  
