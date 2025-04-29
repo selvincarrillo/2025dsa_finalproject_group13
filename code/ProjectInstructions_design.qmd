@@ -397,7 +397,11 @@ sap_all_samples %>%
 
 
 ```{r view(), eval=F, echo=F}
-sap_all_samples %>% View()
+#| tbl-cap: Firt 15 rows of 336 observations in the dataset. Excep Kca_ratio, ph, ec, brix, and sugars, all other variables are in ppm. NAN indicates that the values were <0.05 pmm. 
+
+sap_all_samples %>%
+  gt() %>%
+  tab_style(style = cell_text(weight = "bold"), locations = cells_column_labels())
 ```
 
 ## 3) Statistical model fitting
@@ -413,16 +417,16 @@ Define the correlation structures to be used in the model and select the respons
 # Define a list of correlation structures
 cor_structures <- list(
   none = NULL,
-  compSymm = corCompSymm(form = ~ time_num ),
-  symm = corSymm(),
+  CompSymm = corCompSymm(form = ~ time_num ),
+  Symm = corSymm(),
   #ar1 = corAR1(form = ~ time_num ),
-  car1 = corCAR1(form = ~ time_num ),
-  arma = corARMA(p = 1, q = 1),
-  exp = corExp(form = ~ time_num ),
-  gaus = corGaus(form = ~ time_num ),
-  lin = corLin(form = ~ time_num ),
-  ratio = corRatio(form = ~ time_num ),
-  spher = corSpher(form = ~ time_num )
+  Car1 = corCAR1(form = ~ time_num ),
+  ARMA = corARMA(p = 1, q = 1),
+  Exp = corExp(form = ~ time_num ),
+  Gaus = corGaus(form = ~ time_num ),
+  Lin = corLin(form = ~ time_num ),
+  Ratio = corRatio(form = ~ time_num ),
+  Spher = corSpher(form = ~ time_num )
 )
 
 response_vars <- 
@@ -471,17 +475,51 @@ results <- map(cor_structures, function(cor_struct) {
 
 Create a table of AIC values for each response variable and correlation structure. 
 ```{r}
+#| tbl-cap: AIC values obtained from the linear mixed models fitted with different correlation structures for each of the response variables. 
+
 # Make a tidy table
 aic_table <- results %>%
   map_dfr(~ as_tibble(.x), .id = "cor_structure")
 
 # View the AIC table
-aic_table %>% View()
+aic_table %>% 
+  gt() %>% 
+  fmt_number(columns = everything(), decimals = 2) %>%
+  cols_label(
+    cor_structure = "Correlation\nStructure",
+    brix = "°Brix",
+    n_conv_eff = "N Conv\nEff",
+    nitrogen = "N",
+    ammonium = md("NH<sub>4</sub>"),
+    phosphorus = "P",
+    potassium = "K",
+    calcium = "Ca",
+    magnesium     = "Mg",
+    kca_ratio	 = "K/Ca",
+    sulfur = "S",
+    iron = "Fe",
+    manganese = "Mn",
+    boron = "B",
+    zinc = "Zn",
+    copper = "Cu",
+    sugars = "Sugars",
+    ec = "EC",
+    silica   = "Si",
+    chloride = "Cl",
+    sodium   = "Na",
+    ph = "pH") %>%
+  cols_move (columns = c(nitrogen, n_conv_eff, phosphorus, potassium, calcium, kca_ratio, magnesium, sulfur), after = ammonium) %>%
+  cols_move (columns = c(iron, copper, zinc, manganese, chloride, silica, sodium), after = boron) %>%
+  tab_style(style = cell_text(weight = "bold"),
+             locations = cells_column_labels()) 
+  
 
 ```
 
 Select the best model for each response variable based on AIC values. 
 ```{r}
+#| tbl-cap: Best correlation structure based on the lowest Aic for each of the response variables. 
+ 
 best_model_table <- 
    aic_table %>%
   pivot_longer(
@@ -494,7 +532,37 @@ best_model_table <-
   ungroup() %>%
   select(response, cor_structure, AIC)
 
-best_model_table %>% gt()
+best_model_table %>%
+mutate(response = case_when(
+    response == "brix"~ "°Brix",
+    response == "n_conv_eff" ~ "N Conv\nEff",
+    response == "nitrogen" ~ "N",
+    response == "ammonium" ~ "NH4",
+    response == "phosphorus" ~ "P",
+    response == "potassium" ~ "K",
+    response == "calcium" ~ "Ca",
+    response == "magnesium"  ~ "Mg",
+    response == "kca_ratio"	 ~ "K/Ca",
+    response == "sulfur" ~ "S",
+    response == "iron" ~ "Fe",
+    response == "manganese" ~ "Mn",
+    response == "boron" ~ "B",
+    response == "zinc" ~ "Zn",
+    response == "copper" ~ "Cu",
+    response == "sugars" ~ "Sugars",
+    response == "ec" ~ "EC",
+    response == "silica"  ~ "Si",
+    response == "chloride" ~ "Cl",
+    response == "sodium"  ~ "Na",
+    response == "ph" ~ "pH",
+    TRUE ~ response)) %>%
+  gt() %>%
+  fmt_number(columns = everything(), decimals = 1) %>%
+  cols_label(
+    response = "Response \n variable",
+    cor_structure = "Correlation\nStructure") %>% 
+  tab_style(style = cell_text(weight = "bold"),
+             locations = cells_column_labels()) 
 
 ```
 
@@ -533,6 +601,7 @@ names(best_models) <- names(best_model_list)
 
 ### a) Table of p-values
 ```{r}
+#| tbl-cap: p-values of leaf sap analysis
 # Create a table of p-values
 pval_table <- 
   best_models %>% 
@@ -550,13 +619,38 @@ tbl <- pval_table %>%
   gt() %>%
   cols_label(term = "Factor") %>%
   fmt_number(columns = everything(), decimals = 3) %>%
-  tab_header(title = "", subtitle = "P-value Table") %>%
-  tab_source_note("P ≤ 0.05 indicates significance. Significant values are in bold.") %>%
-  tab_options(heading.align = "left", table_body.hlines.width = px(0)) %>%
-  tab_style(
-    style = cell_fill(color = "lightgray"),
-    locations = cells_body(rows = seq(1, nrow(pval_table), 2))
-  )
+  tab_header(title = "", subtitle = " ") %>%
+  tab_options(heading.align = "left",
+              table_body.hlines.width = px(0)) %>%
+  cols_label(
+    brix = "°Brix",
+    n_conv_eff = "N Conv\nEff",
+    nitrogen = "N",
+    ammonium = md("NH<sub>4</sub>"),
+    phosphorus = "P",
+    potassium = "K",
+    calcium = "Ca",
+    magnesium     = "Mg",
+    kca_ratio	 = "K/Ca",
+    sulfur = "S",
+    iron = "Fe",
+    manganese = "Mn",
+    boron = "B",
+    zinc = "Zn",
+    copper = "Cu",
+    sugars = "Sugars",
+    ec = "EC",
+    silica   = "Si",
+    chloride = "Cl",
+    sodium   = "Na",
+    ph = "pH") %>%
+  cols_move (columns = c(nitrogen, n_conv_eff, phosphorus, potassium, calcium, kca_ratio, magnesium, sulfur), after = ammonium) %>%
+  cols_move (columns = c(iron, copper, zinc, manganese, chloride, silica, sodium), after = boron) %>%
+  tab_style(style = cell_text(weight = "bold"),
+             locations = cells_column_labels()) %>%
+  tab_style(style = cell_fill(color = "lightgray"),
+            locations = cells_body(rows = seq(1, nrow(pval_table), 2))) %>%
+  tab_source_note("P ≤ 0.05 indicates significance. Significant values are in bold.") 
 
 # highlight in bold the significant p-values (p ≤ 0.05) in the table.
 tbl <- reduce(
