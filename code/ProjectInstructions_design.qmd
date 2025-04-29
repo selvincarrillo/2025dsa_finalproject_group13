@@ -1,6 +1,6 @@
 ---
 title: "Data Science Applied to Ag - Final Project - Design"
-author: "FULL NAME STUDENT 1 & FULL NAME STUDENT 2"
+author: "Selvin Carrillo Ramos"
 format:
   html:
     code-fold: false
@@ -10,6 +10,10 @@ format:
     theme: cerulean
 editor_options: 
   chunk_output_type: console
+execute:
+  #echo: false
+  warning: false
+  message: false
 ---
 
 
@@ -40,9 +44,14 @@ Describe here your overall material and methods as it pertains to the analysis y
 ## Study design  
 Clearly describe your study design here, including treatment design (which factors and levels, the hierarchy among them, etc.), and your experimental design (number of reps/blocks, how was randomization performed, etc.), as we talked about in class.  
 
+*The experiment was conducted as a split-split plot randomized complete block design with three blocks. The whole-plot factor was the irrigation system with two levels, drip and micro-sprinkler. Within each whole plot, the split-plot factor was foliar treatment, consisting of water (control; T1), nanocellulose crystals (CNC 3%; T2), Calcium (Ca 6%; T3), Potassium Silicate (K2SiO3; T4), CNC plus Ca (T5), CNC plus K2SiO3 (T6), and soil-base fertilization (100% rate of 10-10-10 at preharvest and at 15.5-0-0 at postharvest; T7) (Table x). Within each foliar treatment, the split-split plot factor was leaf age, with two levels, new and Old leaves. Sampling was performed repeatedly over four time points during fruit growth, three days after foliar sprays, except for T7 which received two applications of soil-based fertilization per season. Randomization was implemented at each level and each block contained all combinations of factors, ensuring a balanced design across treatments.*
 
 ## Statistical analysis  
 Describe here your statistical analysis, including what type of ANOVA model you ran (based on the design above), what was your response variable, what were your explanatory variables and how were the explanatory variables treated (random or fixed). Provide your alpha level. Explain which function from which package you used to analyze this data. Explain how you checked linear model assumptions and whether or not they were met. Overall, make sure you explain in sufficient detail that, if given your data, a knowledgeable person would be able to reproduce your analysis exactly.  
+
+*To account for autocorrelation among repeated measures over time, linear mixed-effects models were fit using the `lme()` function from the `nlme`package, which allows specification of correlation structures. Plots were generated using the `ggplot2` package.*
+*For leaf sap, fixed effects were specified as a full factorial of irrigation system, foliar treatment, leaf age (new vs. old leaves), and sampling time. Random effects were structured hierarchically as block/irrigation/foliar/leaf age, reflecting the split-split plot experimental design. To account for the repeated measures over time, ten candidate correlation structures were evaluated. The correlations included independence (none), compound symmetry (corCompSymm), general symmetric (corSymm), continuous autoregressive of order 1 (corCAR1), autoregressive moving average ARMA(1,1) (corARMA), exponential (corExp), Gaussian (corGaus), linear (corLin), ratio (corRatio), and spherical (corSpher), all applied to the residuals as a function of the numeric time variable DAB. Model selection was based on the lowest Akaike Information Criterion (AIC). Model assumptions were assessed through graphical evaluation of residual vs. fitted value plots, standardized residual QQ-plots, and random effects QQ-plots. Deviations from normality and homoscedasticity were noted for nitrogen conversion efficiency, sodium, silica, pH, and boron. Fixed effect significance was evaluated by Type III Anova from the `car` package. For factors with significant main effects or interactions, alpha < 0.05, pairwise comparisons of least-squares means were performed using the `emmeans` package with Tukey adjustment for multiple comparisons.*
+
 
 # Results  
 Here is where the coding is going to happen, and it will be completely up to you. Include under this section as many sub-sections (using ##) and as many chunks needed to create the analytical workflow for your analysis, starting at loading packages and data, wrangling, EDA, modeling, assumptions checking, ANOVA table, means, pairwise comparisons, and final publication-quality plot.  
@@ -396,10 +405,11 @@ sap_all_samples %>%
 ```
 
 
-```{r view(), eval=F, echo=F}
+```{r}
 #| tbl-cap: Firt 15 rows of 336 observations in the dataset. Excep Kca_ratio, ph, ec, brix, and sugars, all other variables are in ppm. NAN indicates that the values were <0.05 pmm. 
 
 sap_all_samples %>%
+  head(15) %>%
   gt() %>%
   tab_style(style = cell_text(weight = "bold"), locations = cells_column_labels())
 ```
