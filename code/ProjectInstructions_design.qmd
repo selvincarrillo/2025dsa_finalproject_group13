@@ -41,35 +41,35 @@ Describe here the introduction of your problem. Consider this as a shortened ver
 
 *Nanocellulose nanofibrils (CNF), an organic compound derived from dry matter, promise to gain greater use in agriculture. Recent studies explored its uses in freeze protection (Deana, 2023; unpublished) and as an adjuvant in pesticide and foliar applications in blueberries (Tasnim et al., 2022). However, how nanocellulose interacts alone or with foliar fertilizers in facilitating nutrient uptake in peaches, is not well known.*   
 
-*For these reasons, we investigated whether the application of inorganic  foliar fertilizers, alone or in combination with nanocellulose during fruirt growth, enhances nutrient uptake; and, if the nutrient profiles change over time at preharvest. This will help us to assess whether or not the implementation of foliar mineral nutrition in orchard management programs adds any value to detect nutritional imbalances.*   
+*For these reasons, we investigated whether the application of inorganic  foliar fertilizers, alone or in combination with nanocellulose during fruit growth, enhances nutrient uptake; and, if the nutrient profiles change over time at preharvest. This will help us to assess whether or not the implementation of foliar mineral nutrition in orchard management programs adds any value by minimizing nutritional imbalances.*   
 
 # Hypothesis and objectives  
 Describe here your hypothesis, followed by your objectives. Make sure your hypothesis are testable and bold, and objectives are clear. 
 
 *Application of inorganic foliar mineral nutrition alone or in combination with CNF will increase nutrient levels in the leaves during preharvest, and nutrient levels will change over time.*  
 
-*The objectives were to assess the benefits of foliar mineral nutrition on nutrient levels in the leaves during preharvest leaf sap analysis, and to determine nutrient profile changes over time that might impact fruit quality at postharvest.*  
+*The objectives were to assess the benefits of foliar mineral nutrition on nutrient levels in the leaves during preharvest using leaf sap analysis, and to determine nutrient profile changes over time that might impact fruit quality at postharvest.*  
 
 # Material and Methods  
 Describe here your overall material and methods as it pertains to the analysis you will conduct, including study description, site/setup description, what equipment was used, etc. just like you would in a paper. Make sure to clearly explain what was measured and how.
 
 
-*The experiment was conducted on a ten-year-old orchard, trained in an open-vase system, planted at 6.1 m x 4.6 m (20 x 15 ft) at the University of Georgia Peach Research and Extension farm in Griffin, GA. The cultivar Julyprince grafted onto Guardian rootstock was established in a Cecil sandy loam soil. Except treatment 7 (T7), none of the experimental trees received soil or foliar fertilizer applications in 2023, the year prior to the experiment initiation. Pruning was done twice per crop season, spring and summer, and fruit thinning at 50 DAFB in 2024. For pest control, the recommendations of southeastern pest management and culture guide were followed. Water was managed based on the Peach Smart Irrigation App recommendations <https://smartirrigationapps.org/peach-app/>. Even though there was no crop harvest due to a late freeze in 2023, trees were irrigated from July to October; and in 2024 late May to mid-October. *  
+*The experiment was conducted on a ten-year-old orchard, trained in an open-vase system, planted at 6.1 m x 4.6 m (20 x 15 ft) at the University of Georgia Peach Research and Extension farm in Griffin, GA. The cultivar Julyprince grafted onto Guardian rootstock was established in a Cecil sandy loam soil. Except treatment 7 (T7), none of the experimental trees received soil or foliar fertilizer applications in 2023, the year prior to the experiment initiation. Pruning was done twice per crop season, spring and summer, and fruit thinning at 50 days after blooming (DAFB). For pest control, the recommendations of southeastern pest management and culture guide were followed. Water was managed based on the Peach Smart Irrigation App recommendations <https://smartirrigationapps.org/peach-app/>. Even though there was no crop harvest due to a late freeze in 2023, trees were irrigated from July to October; and, in 2024 late May to mid-October. *  
 
-*Foliar applications were scheduled at two-week intervals on non-windy days with temperatures < 30 C to minimize burning or scorching on hot days when evaporation is high. We utilized DI water as solvent to avoid solution pH adjustments or potential incompatibility. In 2024, except T5 second spray, applications were at 36, 50, 67, 80, and 94 DAFB by following the average of the manufacturer's recommended dosage; except T5, which was reduced to half of the average recommended dose to minimize its viscosity. We ended applications four weeks before harvest. Each solution was mixed at 1000 rpm for 15 minutes and applied to the tree canopy using a spray gun with two nozzles connected to a CO2 pressurized sprayer, which gave a 35-40 psi. *  
+*Foliar applications were scheduled at two-week intervals on non-windy days with temperatures < 30 C to minimize burning or scorching on hot days when evaporation is high. We utilized DI water as solvent to avoid solution pH adjustments or potential incompatibility. Except treatment (T5) second spray, applications were at 36, 50, 67, 80, and 94 DAFB by following the average of the manufacturer's recommended dosage; and except T5, which was reduced to half of the average recommended dose to minimize its viscosity. We ended applications four weeks before harvest. Each solution was mixed at 1000 rpm for 15 minutes and applied to the tree canopy using a spray gun with two nozzles connected to a CO2 pressurized sprayer, which gave a 35-40 psi. *  
 
-*Foliar applications were carried out three or four days prior to leaf sampling. Except after the second foliar application, 90 g of old and new leaf samples, including petioles, were collected between 8 am and 11 am at 40, 72, 86, and 100 days after full bloom (DAFB) for sap analysis. Fully developed and expanded young leaves are around the third leaf from the growing point, and old functional leaves are from the middle to the last leaf on the woody growth for the current year. Samples with no surface moisture were placed in air-free Ziplock bags and then in coolers with ice packs, transported to the lab, and sent overnight for analysis. Samples were collected on clear days and temperatures < 27 °C.  *   
+*Foliar applications were carried out three or four days prior to leaf sampling. Except after the second foliar application, 90 g of old and new leaf samples, including petioles, were collected between 8 am and 11 am at 40, 72, 86, and 100 DAFB for sap analysis. Fully developed and expanded young leaves are around the third leaf from the growing point, and old functional leaves are from the middle to the last leaf on the woody growth for the current year. Samples with no surface moisture were placed in air-free Ziplock bags and then in coolers with ice packs, transported to the lab, and sent overnight for analysis. Samples were collected on clear days and temperatures < 27 C.  *   
 
 ## Study design  
 Clearly describe your study design here, including treatment design (which factors and levels, the hierarchy among them, etc.), and your experimental design (number of reps/blocks, how was randomization performed, etc.), as we talked about in class.  
 
-*The experiment was conducted as a split-split plot randomized complete block design with three blocks. The whole-plot factor was the irrigation system with two levels, drip and micro-sprinkler. Within each whole plot, the split-plot factor was foliar treatment, consisting of water (control; T1), nanocellulose crystals (CNC 3%; T2), Calcium (Ca 6%; T3), Potassium Silicate (K2SiO3; T4), CNC plus Ca (T5), CNC plus K2SiO3 (T6), and soil-base fertilization (100% rate of 10-10-10 at preharvest and at 15.5-0-0 at postharvest; T7) (Table x). Within each foliar treatment, the split-split plot factor was leaf age, with two levels, new and Old leaves. Sampling was performed repeatedly over four time points during fruit growth, three days after foliar sprays, except for T7 which received two applications of soil-based fertilization per season. Randomization was implemented at each level and each block contained all combinations of factors, ensuring a balanced design across treatments.*
+*The experiment was conducted as a split-split plot randomized complete block design with three blocks. The whole-plot factor was the irrigation system with two levels, drip and micro-sprinkler. Within each whole plot, the split-plot factor was foliar treatment, consisting of water (control; T1), nanocellulose crystals (CNC 3%; T2), Calcium (Ca 6%; T3), Potassium Silicate (K2SiO3; T4), CNC plus Ca (T5), CNC plus K2SiO3 (T6), and soil-base fertilization (100% rate of 10-10-10 at preharvest and at 15.5-0-0 at postharvest; T7). Within each foliar treatment, the split-split plot factor was leaf age, with two levels, new and old leaves. Sampling was performed repeatedly over four time points during fruit growth, three days after foliar sprays, except for T7 which received two applications of soil-based fertilization per season. Randomization was implemented at each level and each block contained all combinations of factors, ensuring a balanced design across treatments.*
 
 ## Statistical analysis  
 Describe here your statistical analysis, including what type of ANOVA model you ran (based on the design above), what was your response variable, what were your explanatory variables and how were the explanatory variables treated (random or fixed). Provide your alpha level. Explain which function from which package you used to analyze this data. Explain how you checked linear model assumptions and whether or not they were met. Overall, make sure you explain in sufficient detail that, if given your data, a knowledgeable person would be able to reproduce your analysis exactly.  
 
 *To account for autocorrelation among repeated measures over time, linear mixed-effects models were fit using the `lme()` function from the `nlme`package, which allows specification of correlation structures. Plots were generated using the `ggplot2` package.*
-*For leaf sap, fixed effects were specified as a full factorial of irrigation system, foliar treatment, leaf age (new vs. old leaves), and sampling time. Random effects were structured hierarchically as block/irrigation/foliar/leaf age, reflecting the split-split plot experimental design. To account for the repeated measures over time, ten candidate correlation structures were evaluated. The correlations included independence (none), compound symmetry (corCompSymm), general symmetric (corSymm), continuous autoregressive of order 1 (corCAR1), autoregressive moving average ARMA(1,1) (corARMA), exponential (corExp), Gaussian (corGaus), linear (corLin), ratio (corRatio), and spherical (corSpher), all applied to the residuals as a function of the numeric time variable DAB. Model selection was based on the lowest Akaike Information Criterion (AIC). Model assumptions were assessed through graphical evaluation of residual vs. fitted value plots, standardized residual QQ-plots, and random effects QQ-plots. Deviations from normality and homoscedasticity were noted for nitrogen conversion efficiency, sodium, silica, pH, and boron. Fixed effect significance was evaluated by Type III Anova from the `car` package. For factors with significant main effects or interactions, alpha < 0.05, pairwise comparisons of least-squares means were performed using the `emmeans` package with Tukey adjustment for multiple comparisons.*
+*For leaf sap, fixed effects were specified as a full factorial of irrigation system, foliar treatment, leaf age (new vs. old leaves), and sampling time. Random effects were structured hierarchically as block/irrigation/foliar/leaf age, reflecting the split-split plot experimental design. To account for the repeated measures over time, ten candidate correlation structures were evaluated. The correlations included independence (none), compound symmetry (corCompSymm), general symmetric (corSymm), continuous autoregressive of order 1 (corCAR1), autoregressive moving average ARMA(1,1) (corARMA), exponential (corExp), Gaussian (corGaus), linear (corLin), ratio (corRatio), and spherical (corSpher), all applied to the residuals as a function of the numeric time variable DAB. Model selection was based on the lowest Akaike Information Criterion (AIC). Model assumptions were assessed through graphical evaluation of standardized residual vs. fitted value plots, standardized residual QQ-plots, and random effects QQ-plots. Deviations from normality and homoscedasticity were noted for nitrogen conversion efficiency, sodium, silica, pH, and boron. Fixed effects significance was evaluated by Type III ANOVA from the `car` package. For factors with significant main effects or interactions, alpha < 0.05, pairwise comparisons of least-squares means were performed using the `emmeans` package with Tukey adjustment for multiple comparisons.*
 
 
 # Results  
@@ -81,6 +81,7 @@ Before each chunk, describe the steps being performed in that chunk. For example
 
 If a chunk produces output, like printing a data frame, statistical summary, a plot, ANOVA table, etc., make sure to write text interpreting what you see and how you can/will use that information to move forward to the next steps in the workflow.  
 
+## Libraries  
 ```{r libraries, echo=FALSE}
 # libraries 
 library(kableExtra)
@@ -106,10 +107,11 @@ library(here)
 ```
 
 
-## 1) Read in and clean data 
+## Read in and clean data 
 
-Let's read in the datasets coming from the lab where each dataset should have 96 observations coming from four different time points. At the end, combine the datasets into one by assigning their respective time point, block, and treatments.   
-First sampling
+Let's read in the four datasets where each should have 96 observations coming from four different time points. At the end, combine the datasets into one by assigning their respective factor and levels, time point, and block.   
+
+First sampling data 
 ```{r 2024_first-sampling}
 # read in data set from first sampling
 sap_1 <- 
@@ -156,7 +158,7 @@ sap_1 <-
 
 ```
 
-Second sampling   
+Second sampling data.   
 ```{r 2024_second-sampling}
 # read in data set from second sampling
 sap_2 <- 
@@ -199,7 +201,7 @@ sap_2 <-
    dplyr:: select(!c(sample_id, sl)) 
 ```
 
-Third sampling   
+Third sampling data.    
 ```{r 2024_third-sampling}
 # read in data set from third sampling
 sap_3 <- 
@@ -243,7 +245,7 @@ sap_3 <-
 
 ```
 
-Fourth sampling  
+Fourth sampling data  
 ```{r 2024_fourth-sampling}
 # read in data set from fourth sampling
 sap_4 <- 
@@ -288,8 +290,7 @@ sap_4 <-
 
 ```
 
-
-Final data set  
+Join the previous datasets into onfe
 ```{r 2024_sap-all-samples, warning=F}
 # combined data set for all four sap sampling times (48 trees * 2 samples per tree = 96 samples per time point. So, 96 samples * 4 sampling times = 384 observations). However, we need to summarize the samples from `S` because there are two subsamples or trees per time point, otherwise it will be pseudoreplication. In total we need to have 336 observations. 
 
@@ -317,9 +318,10 @@ sap_all_samples <-
 Let's confirm that:     
 
 - Number of blocks: 3     
-- Number o treatments: 7 foliar sprays (T1, T2, T3, T4, T5, T6, T7) x 2 irrigation systems (drip and micro-sprinkler) X 2 tissues (new and old) = 28   
+- Number o treatments: 7 foliar sprays (T1, T2, T3, T4, T5, T6, T7) x 2 irrigation systems (drip and micro-sprinkler) X 2 leaf ages or tissues (new and old) = 28   
 - Number of observations: 3 x 28 = 84 observations per sample point (4 time points x 84 = 336 observations)  
 
+Summaries of number of observations, mean, min, and maximun values.  
 ```{r}
 sap_all_samples %>% psych::describe() 
 ```
@@ -329,8 +331,9 @@ We might consider to exclude nitrate, cobalt, molybdenum, nickel, and selenium f
 sap_all_samples %>% glimpse()
 ```
 
-Density plots of macronutrients, except Potassium
+Macronutrients, except potassium, were <0.05 ppm. 
 ```{r density plot macro}
+#| fig-cap: Density plots of macronutrients. 
 library(ggridges)
 
 sap_all_samples %>% 
@@ -350,8 +353,9 @@ sap_all_samples %>%
    theme(legend.position = "none") 
 ```
 
-Density plots of micronutrients and trace elements 
+Most micronutrients were < 25 ppm. 
 ```{r density plot micro}
+#| fig-cap: Density plots of micronutrients. 
 library(ggridges)
 
 sap_all_samples %>% 
@@ -374,6 +378,8 @@ sap_all_samples %>%
 
 Boxplots of Irrigation system within each block 
 ```{r}
+#| fig-cap: Macro- and micronutrients at different irrigation systems within each block.  
+
 sap_all_samples %>% 
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
@@ -382,7 +388,7 @@ sap_all_samples %>%
    #plot 
    ggplot(aes(x= block, y = value, fill= irr_system)) + 
    geom_boxplot(position = position_dodge(width = 0.75), alpha =0.75) + 
-   geom_point(position = position_dodge(width = 0.75)) + 
+   #geom_point(position = position_dodge(width = 0.75)) + 
    geom_rug() +
    facet_wrap(.~name, scales= "free") +
    scale_fill_viridis_d() + 
@@ -391,6 +397,8 @@ sap_all_samples %>%
 
 Boxplots of foliar treatment within each irrigation system 
 ```{r}
+#| fig-cap: Macro- and micronutrients at different foliar treatments within each irrigation system. 
+
 sap_all_samples %>% 
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
@@ -408,6 +416,8 @@ sap_all_samples %>%
 
 Boxplots of new/old within foliar treatment 
 ```{r}
+#| fig-cap: Macro- and micronutrients at different leaf ages within each foliar treatment.  
+
 sap_all_samples %>% 
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
@@ -433,17 +443,17 @@ sap_all_samples %>%
   tab_style(style = cell_text(weight = "bold"), locations = cells_column_labels())
 ```
 
-## 3) Statistical model fitting
-Let's remember that `lmer()` function does not allow to specify correlation structures while `lme()` allows to fit spatial and temporal correlation structures.
+## Statistical model fitting
+Let's remember that `lmer()` function does not allow to specify correlation structures while `lme()` allows to fit spatial and temporal correlation structures.  
 
-Because our data includes a time variable, it should be analyzed as a **split-split-plot repeated measures**.  
+Because our data includes a time variable, it should be analyzed as a **split-split-plot RCBD repeated measures**.  
 
 - For fixed effects, let's remember that our whole-plot is irrigation system, split-plot is foliar treatment, spli-split plot is new-old leaves, and time is our repeated measures.  
-- For random effects the nesting goes from biggest to lowest: replicate/whole-plot/split-plot/split-split-plot. Thus, time_num is considered to be nested within old_new leaves.  
+- For random effects the nesting goes from biggest to lowest: replicate/whole-plot/split-plot/split-split-plot. Thus, time (numeric variable) is considered to be nested within old_new leaves.  
 
-Define the correlation structures to be used in the model and select the response variables to use
+Define the correlation structures to be used in the model and select the response variables to use. 
 ```{r}
-# Define a list of correlation structures
+# define a list of correlation structures
 cor_structures <- list(
   none = NULL,
   CompSymm = corCompSymm(form = ~ time_num ),
@@ -460,6 +470,7 @@ cor_structures <- list(
 
 response_vars <- 
    sap_all_samples %>% 
+  # except time_num, these variables are <0.05 ppm or were not detected. 
    select(!c(time_num, nitrate, cobalt, molybdenum, nickel, selenium)) %>% 
   select(where(is.numeric)) %>% 
   names()
@@ -488,7 +499,7 @@ fit_model <- function(response, cor_struct) {
   )
 }
 
-# Now map over correlation structures and response variables
+# map over correlation structures and response variables
 results <- map(cor_structures, function(cor_struct) {
   map(response_vars, function(response) {
     model <- fit_model(response, cor_struct)
@@ -506,14 +517,15 @@ Create a table of AIC values for each response variable and correlation structur
 ```{r}
 #| tbl-cap: AIC values obtained from the linear mixed models fitted with different correlation structures for each of the response variables. 
 
-# Make a tidy table
+# tidy table
 aic_table <- results %>%
   map_dfr(~ as_tibble(.x), .id = "cor_structure")
 
-# View the AIC table
+# AIC table
 aic_table %>% 
   gt() %>% 
   fmt_number(columns = everything(), decimals = 2) %>%
+  # change variable names 
   cols_label(
     cor_structure = "Correlation\nStructure",
     brix = "°Brix",
@@ -584,6 +596,7 @@ mutate(response = case_when(
     response == "chloride" ~ "Cl",
     response == "sodium"  ~ "Na",
     response == "ph" ~ "pH",
+    response == "aluminum" ~ "Al",
     TRUE ~ response)) %>%
   gt() %>%
   fmt_number(columns = everything(), decimals = 1) %>%
@@ -597,10 +610,10 @@ mutate(response = case_when(
 
 Based on the best correlation structure for each response variable, fit the final models. 
 ```{r}
-# Make it easier to access
+# create a vector to get the names 
 best_model_list <- best_model_table %>% deframe() # named vector: response -> cor_structure
 
-# Now fit the models
+# fit the models
 best_models <- map2(
   names(best_model_list),    # responses
   best_model_list,           # best correlation structure names
@@ -628,13 +641,14 @@ names(best_models) <- names(best_model_list)
 
 ```
 
-### a) Table of p-values
+### Table of p-values
 ```{r}
 #| tbl-cap: p-values of leaf sap analysis
+
 # Create a table of p-values
 pval_table <- 
   best_models %>% 
-   discard(is.null) %>%  # <-- remove NULL models first
+  discard(is.null) %>%  # remove NULL models first
   map(~ .x %>% Anova(type = 3) %>% tidy()) %>% # get Anova output and tidy
   map(~ .x %>% clean_names() %>% select(term, p_value)) %>% # clean names
   bind_rows(.id = "response") %>% # make a big table
@@ -643,7 +657,7 @@ pval_table <-
 
 
 
-# Start with basic table
+# create table
 tbl <- pval_table %>%
   gt() %>%
   cols_label(term = "Factor") %>%
@@ -695,15 +709,15 @@ tbl <- reduce(
 tbl
 ```
 
-### a) model assumptions
+### Model assumption plots 
 ```{r}
 library(broom.mixed)  # for augment()
 
-# Discard NULL models from best_models
+# discard NULL models from best_models
 best_models_clean <- best_models %>% discard(is.null)
 
 
-# 1. Make residuals and standardized residuals for each model
+# 1. Standardized residuals for each model
 residuals_df <- 
   best_models %>%
   discard(is.null) %>%
@@ -711,7 +725,7 @@ residuals_df <-
         mutate(.stdresid = resid(.x, type = "pearson", scaled = TRUE))
       )
 
-# 2. Plot random effects QQ-plots for each random term
+# 2. Plot random effects QQ-plots for each random term (factor)
 
 plot_random_effects <- function(model) {
   raneffects <- ranef(model)
@@ -767,24 +781,34 @@ diagnostic_plots <- map2(
   }
 )
 
-# assign plot names
+# 5. Assign plot names
 names(diagnostic_plots) <- names(best_models_clean)
 
-diagnostic_plots$brix
 
-
+# 6. Loop over the list and save each plot (just once). 
+# for (i in seq_along(diagnostic_plots)) {
+#   ggsave(
+#     filename = paste0("output/diagnostic_plot_", i, ".png"),
+#     plot = diagnostic_plots[[i]],
+#     width = 8,
+#     height = 6,
+#     bg = "white"
+#   )
+# }
 ```
-For the model assumptions, we may have problems with N conversion efficiency, sodium, silica, pH, boron,  
+For the model assumptions (homoscedasticity, normality, and no outliers), we may have problems with N conversion efficiency, sodium, silica, pH, and boron. 
 
 
-### b) post hoc tests 
+### Paiwise comparisons and plots  
 
-We are interested in those interactions with foliar treatment and time, so we will run post hoc tests on those models. First, we will start from higher order interactions. 
+We are interested in those interactions with foliar treatment and time, so we will run post hoc tests on those models. Start from higher order interactions. 
 
-#### Foliar treatment, new/old, and time
+#### Foliar treatment, leaf age, and time interaction 
 
 Sodium 
 ```{r}
+#| fig-cap: Na levels at 40, 72, 86, and 100 DAB for new and old leves. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+
 na <- 
    best_models$sodium %>% 
    #estimated marginal means (a.k.a. least-squares means) 
@@ -821,11 +845,13 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.8))
 ```
-Nanocellulose may be causeing sodim increase because there are higher values for T2. 
+T2 and T6, which have nanocellulose, may be causing sodium increase because there are higher values at 40 and 100 DAB. 
 
 
 Sugars 
 ```{r}
+#| fig-cap: Sugars levels at 40, 72, 86, and 100 DAB for new and old leves. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+
 sug <- 
    best_models$sugars %>% 
    #estimated marginal means (a.k.a. least-squares means) 
@@ -862,11 +888,14 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.8))
 ```
-We have difference within each time point in the new leaves only. For T4, T5, T6 at 72 DAB, the low sugars might be that they are not being translocated to the leaves.
+Differences are present in the new leaves only for all time points. Foliar treatments T3, T4, T5 enhanced sugars in the new leaves compared with the soil-based fertilization at 86 and 100 DAB.
 
-#### Irrigation system, foliar treatment, and time  
+#### Irrigation system, foliar treatment, and time interaction  
+
 Boron 
 ```{r}
+#| fig-cap: B levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+#| 
 #estimated marginal means (a.k.a. least-squares means) 
 b_sym_cld <- 
    best_models$boron %>% 
@@ -903,11 +932,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.7))
 ```
-
+Foliar treatments were different only at 40 DAB in the drip irrigation system; and the soil-based fertilization had higher levels compared to the rest of foliar treatments, except T1. B decreased sharply after 40 DAB in both irrigation systems, which indicates that plants were unable to move sugars, N, and P from source to sink tissues because B helps load those nutrients into the phloem.
 
 Copper 
 ```{r}
-#estimated marginal means (a.k.a. least-squares means) 
+#| fig-cap: Cu levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+
 cu <- 
    best_models$copper %>% 
    emmeans(~  foliar_trt | irr_system | time) %>% # compares new_old at each time point 
@@ -943,10 +973,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.8))
 ```
-
+Cu decreased until 86 DAB for both irrigation systems. T3 and T4 are different at 72m 86, and 100 DAB in the drip systems, and at 40 and 72 DAB, which may suggest that they are interacting with other elements.  
 
 Magnesium 
 ```{r}
+#| fig-cap: Mg levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+
 mg <- 
    best_models$magnesium %>% 
    emmeans(~  foliar_trt |irr_system | time) %>% # compares foliar_trt within irrigation at each time point 
@@ -982,11 +1014,13 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.6,0.8))
 ```
-Mainly differences in the drip irrigation. 
+Mg was increasing in both irrigation systemsm, however, it decreased at 100 DAB. The soil based fertilization (T7), was at a low level compared to the foliar treatments, which can indicate that foliar treatments helped with higher Mg levels.  
 
 
 Manganese 
 ```{r}
+#| fig-cap: Mn levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| 
 mn <- 
    best_models$manganese %>% 
    emmeans(~  foliar_trt |irr_system | time) %>% # compares foliar_trt within irrigation at each time point 
@@ -1022,12 +1056,14 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.6,0.8))
 ```
-Seems like most of the foliar sprays were lower in Mn compared to control and T7 (soil fertilization), at least at 86 DAB in the drip irrigation. 
+Main differences among treatments were at 40 DAB. The control treatment (T1) was highly variable at all time points.  
 
-#### Foliar treatment and time  
+#### Foliar treatment and time interaction   
+
 Ammonium 
 ```{r}
-#estimated marginal means (a.k.a. least-squares means) 
+#| fig-cap: NH4 levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.
+#| 
 nh4 <- 
    best_models$ammonium  %>% 
    emmeans(~  foliar_trt | time ) %>% # compares foliar_trt at each time point
@@ -1061,12 +1097,14 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.9))
+         legend.position = c(0.4,0.8))
 ```
+NH4 were higher higher in the soil-based fertilization at 40, 72, and 100 DAB. This may be due to the application of fertilizer to the soil twice per season.  
 
 Calcium 
 ```{r}
-#estimated marginal means (a.k.a. least-squares means) 
+#| fig-cap: Ca levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.
+#| 
 ca <- 
    best_models$calcium %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1102,9 +1140,13 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.7,0.8))
 ```
+Nanocellulose increased Calcium (T5) and Potassium Silicate (T6) uptake at 40 DAB. Calcium on the soil-based fertilization (T7) was lower at 40 and 100 DAFB.  
+
 
 Electrical conductivity 
 ```{r}
+#| fig-cap: EC levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.
+#| 
 ec <- 
    best_models$ec %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1140,9 +1182,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.7,0.8))
 ```
+EC may have been related to moisture changes in the soil at 72 DAB.   
 
 Iron
 ```{r}
+#| fig-cap: Fe levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+#| 
 fe <- 
    best_models$iron %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1178,9 +1223,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.7,0.8))
 ```
+Iron increased until after 86 DAB.   
 
 Potassium/Calcium ratio
 ```{r}
+#| fig-cap: K/Ca ratio levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05. 
+#| 
 kca <- 
    best_models$kca_ratio %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1216,9 +1264,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.8))
 ```
+Likely there was an imbalace between K and Ca in the leaves. The ratio increased at 86 DAB, maybe because the fruits were big enouth that there were not able to uptake more Ca.  
 
 Nitrogen 
 ```{r}
+#| fig-cap: K/Ca ratio levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| 
 n <- 
    best_models$nitrogen %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1254,9 +1305,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.8))
 ```
+N was fairly constant at all time points. AT 72 DAB, the soil based-fertilizer treatment (T7) had higher levels.  
 
 pH
 ```{r}
+#| fig-cap: pH levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| 
 ph <- 
    best_models$ph %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1292,9 +1346,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.6,0.2))
 ```
+pH was decreasing over time. The soil based-fertilizer is different at 72 DAB.  
 
 Phosphorus
 ```{r}
+#| fig-cap: P levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| 
 p <- 
    best_models$phosphorus %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1328,11 +1385,14 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.9))
+         legend.position = c(0.4,0.8))
 ```
+Higher P levels at 40 DAB in the soil based-fertilizer. Which make sense since there was an application in the spring of 10-10-10 for this treatment (T7).  
 
 Potassium 
 ```{r}
+#| fig-cap: K levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| 
 k <- 
    best_models$potassium %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1368,10 +1428,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.4,0.9))
 ```
+K levels increased until 86 DAB, then decreased because it could have moved to the fruit, e.g., sink tissue.  
 
 Silica 
 ```{r}
-#estimated marginal means (a.k.a. least-squares means) 
+#| fig-cap: Si levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#|  
 si <- 
    best_models$silica %>% 
    emmeans(~  foliar_trt|irr_system| time) %>% #compares foliar_trt within each irrigation 
@@ -1407,9 +1469,13 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.7,0.8))
 ```
+Sharp decline of Si after 40 DAB. The plant may have used it to deal with biotic or abiotic stresses.  Silica levels are in fact greater in T4 and T6, but not significantly different.  
 
 Sulfur 
 ```{r}
+#| fig-cap: S levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| fig-width: 6
+#| fig-height: 4
 s <- 
    best_models$sulfur %>% 
    emmeans(~  foliar_trt | time) %>% # 
@@ -1445,9 +1511,12 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.6,0.8))
 ```
+We have an outlier for S at 100 DAB. S levels were fairly constant at 86 DAB.  
 
-Sulfur 
+Zn
 ```{r}
+#| fig-cap: Zn levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| 
 zn <- 
    best_models$zinc %>% 
    emmeans(~  foliar_trt | time) %>% # 
@@ -1483,8 +1552,9 @@ ggplot(mapping = aes(fill = time)) +
          panel.grid.minor = element_blank(), 
          legend.position = c(0.6,0.8))
 ```
+Zn was decreasing over time, which may have been caused by the high levels of P. The could be some antagonism between P and Zn.
 
-In general, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, pre- and post-harvest.
+In general, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, e.g., pre- and post-harvest, however, it is not always the case. 
 
 ## 4) Suficiency ranges for leaf sap  
 
@@ -1598,8 +1668,15 @@ pivot_wider(names_from = time, values_from = value) %>%  # Status will still be 
 ```
 
 
-## 4) Takeaway  
-Overall, Ca, S, Fe, Mn, B, and Cu, Sugars, and pH were below the minimum levels at all time points. N remained within the expected range, while P and K were above the maximum levels at preharvest. These results suggest that the plants had imbalances in macro- and micro nutrients during fruit growth that will likely compromise fruit quality. 
+## 4) Takeaway 
+Fruit quality can only be improved before harvest or preharvest, so looking at the nutritional status in the leaves during fruit growth has been overlookeked in the standard guidelines of nutrient management guidelines for the Southeast. Overall, all nutrient changed over time, which reflects the critical phenological stages during fruit growth. Ca, S, Fe, Mn, B, and Cu, Sugars, and pH were below the minimum levels at all time points. N remained within the expected range, while P and K were above the maximum levels. These results suggest that the plants had imbalances in macro- and micro nutrients during fruit growth that will likely compromise fruit quality. 
+
+Although, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, e.g., pre- and post-harvest,  it is not always the case. Foliar applications showed increased levels for some mineral nutrients at specific time points, but not all. 
+
+Nanocellulose increased Calcium (T5) and Potassium Silicate (T6) uptake only at 40 DAB. In the case of K, nanocellulose significantly increased K uptake only at 100 DAB. This may indicate that nanocellulose could potentially enhance the uptake of nutrients in the early stages of fruit growth, specially for Calcium.
+
+In summary, leaf sap analysis revealed nutrient imbalances at preharvest that will potentially impact fruit quality, and thus consumer preference towards fresh peaches.  
+
 
 # Team work in GitHub  
 Whether you are working with your future-self or as duos, make sure to stage, commit, and push after finishing each of the sub-sections above. When committing, write commit messages that are short and descriptive (e.g., finished wrangling).  
