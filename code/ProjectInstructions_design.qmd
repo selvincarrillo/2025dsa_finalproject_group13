@@ -1486,6 +1486,120 @@ ggplot(mapping = aes(fill = time)) +
 
 In general, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, pre- and post-harvest.
 
+## 4) Suficiency ranges for leaf sap  
+
+Sufficiency ranges in ppm for micro- and micro-nutrients. 
+```{r}
+reference_ranges <- tribble(
+  ~response, ~Min, ~Max,
+  "N", 500, 1250,
+  "P", 120, 300,
+  "K", 3800, 5000,
+  "Ca", 100, 200,
+  "Mg", 500, 650,
+  "S", 60, 120,
+  "Fe", 4, 10,
+  "Mn", 10, 25,
+  "B", 5, 10,
+  "Cu", 2, 7,
+  "Zn", 3, 6,
+  "Mo", 0.5, 2.5,
+  "Cl", 350, 1500,
+  "Na", 25, 100,
+  "Si", 20, 50,
+  "Sugars (%)", 1.5, 3.5,
+  "°Brix (%)", 6, 10,
+  "pH", 5.5, 6,
+  "EC (mS/cm)", 1, 2.5
+)
+
+```
+
+
+Summarise data for each time point for all variables. 
+```{r}
+sap_all_samples %>% 
+   group_by(time_num) %>% 
+   summarise(across(where(is.numeric), \(x)  mean(x, na.rm= TRUE))) %>% 
+   ungroup() %>% 
+   relocate(nitrogen, phosphorus, potassium, calcium, magnesium, sulfur,
+            iron, manganese, boron, copper, zinc, chloride, aluminum,
+            sodium, silica, sugars, brix, ph, ec, n_conv_eff, ammonium, kca_ratio, .after = time_num ) %>%
+   pivot_longer(nitrogen: selenium) %>% 
+   mutate(time_num = paste0("DAF", "_", time_num)) %>% 
+   pivot_wider(names_from = time_num, values_from = value) %>% 
+  mutate(response = name, .keep = "unused") %>%
+  relocate(response, .before = DAF_40) %>%
+    mutate(response = case_when(
+    response == "brix"~ "°Brix (%)",
+    response == "n_conv_eff" ~ "N Conv\nEff",
+    response == "nitrogen" ~ "N",
+    response == "ammonium" ~ "NH4",
+    response == "phosphorus" ~ "P",
+    response == "potassium" ~ "K",
+    response == "calcium" ~ "Ca",
+    response == "magnesium"  ~ "Mg",
+    response == "kca_ratio"	 ~ "K/Ca",
+    response == "sulfur" ~ "S",
+    response == "iron" ~ "Fe",
+    response == "manganese" ~ "Mn",
+    response == "boron" ~ "B",
+    response == "zinc" ~ "Zn",
+    response == "copper" ~ "Cu",
+    response == "sugars" ~ "Sugars (%)",
+    response == "ec" ~ "EC (mS/cm)",
+    response == "silica"  ~ "Si",
+    response == "chloride" ~ "Cl",
+    response == "sodium"  ~ "Na",
+    response == "ph" ~ "pH",
+    response == "aluminum" ~ "Al",
+    response == "nitrate" ~ "NO3",
+    response == "molybdenum" ~ "Mo",
+    response == "nickel" ~ "Ni",
+    response == "selenium" ~ "Se",
+    response == "cobalt" ~ "Co",
+    TRUE ~ response)) %>%
+  right_join(reference_ranges, by = "response") %>%
+  pivot_longer(cols = starts_with("DAF_"), names_to = "time", values_to = "value") %>%
+mutate(Status = case_when(
+  is.na(Min) | is.na(value) ~ NA_character_,
+  value < Min ~ "Deficient",
+  value > Max ~ "Excess",
+  value >= Min & value <= Max ~ "Good")) %>%
+pivot_wider(names_from = time, values_from = value) %>%  # Status will still be one column
+  relocate(Status, .after = DAF_100 ) %>% 
+   gt() %>% 
+   fmt_number(columns = c(DAF_40, DAF_72, DAF_86, DAF_100), decimals = 1) %>% 
+  fmt_number(columns = c(Min, Max), decimals = 0) %>% 
+   tab_spanner (label = "Days After Blooming (DAB)", columns = c(DAF_40, DAF_72, DAF_86, DAF_100)) %>%
+  tab_spanner (label = "Expected\nRange", columns = c(Min, Max)) %>%
+  tab_spanner (label = "(ppm)", columns = c(Min , Max, DAF_40, DAF_72, DAF_86, DAF_100)) %>%
+  
+  cols_label(DAF_40 = "40", 
+              DAF_72 = "72", 
+              DAF_86 = "86", 
+              DAF_100 = "100") %>%
+  cols_label(response = "Response \n variable") %>% 
+  tab_style(style = cell_text(weight = "bold"),
+             locations = cells_column_labels()) %>% 
+    tab_style(
+    style = cell_text(color = "red", weight = "bold"),
+    locations = cells_body(columns = Status, rows = Status == "Deficient")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = Status, rows = Status == "Excess")
+  ) %>%
+  tab_style(
+    style = cell_text(color = "darkgreen", weight = "bold"),
+    locations = cells_body(columns = Status, rows = Status == "Good")
+  )
+  
+```
+
+
+## 4) Takeaway  
+Overall, Ca, S, Fe, Mn, B, and Cu, Sugars, and pH were below the minimum levels at all time points. N remained within the expected range, while P and K were above the maximum levels at preharvest. These results suggest that the plants had imbalances in macro- and micro nutrients during fruit growth that will likely compromise fruit quality. 
 
 # Team work in GitHub  
 Whether you are working with your future-self or as duos, make sure to stage, commit, and push after finishing each of the sub-sections above. When committing, write commit messages that are short and descriptive (e.g., finished wrangling).  
