@@ -35,11 +35,30 @@ To get you setup, you will need to:
 # Introduction  
 Describe here the introduction of your problem. Consider this as a shortened version of your paper, where you will briefly discuss in 3-4 paragraphs what is the issue/gap in literature, and how the data you collected will help answer this gap.  
 
+*Peach fruit quality constitutes a key factor in the fresh market due to consumer preferences for better taste, appealing color, higher nutrition, or extended fruit shelf life. Among other reasons, poor fruit quality has been attributed to a decline in peach consumption in the last decade (Anthony & Minas, 2022; Cirilli et al., 2016). To maintain or improve fruit quality, some commonly observed preharvest factors include manipulating crop load, fruit position, rootstock and cultivars, and training systems (Minas et al., 2018), yet foliar fertilizers have been overlooked. Foliar fertilizers constitute an integral tool for various commodity crops to provide essential nutrients at rapid growth stages to maintain physiological processes and achieve maximum yield (Taiz et al., 2015); however, the current Southeastern pest management and culture guide for peach, nectarine, and plum lacks any annual foliar spray recommendations.*    
+
+*In the leaves, mobile nutrients, i.e., N, P, K and Mg, present in certain older tissues may compensate for deficiencies or demand in sink tissues; however, non-mobile nutrients, i.e., Ca and B, cannot be transported from older to young leaves (Taiz et al., 2015).  This is critical because, for example, K/Ca ratio contributes to fruit quality, i.e., cell strength and filling. Thus, by exploring nutrient statuses in the leaves during fruit growth, we might be able to get insights into the plant’s assimilation and translocation of nutrients. As noted previously, cultivar-specific preharvest practices, including ripening time, influence micro- and macronutrient concentration (Zhou & Melgar, 2019).*   
+
+*Nanocellulose nanofibrils (CNF), an organic compound derived from dry matter, promise to gain greater use in agriculture. Recent studies explored its uses in freeze protection (Deana, 2023; unpublished) and as an adjuvant in pesticide and foliar applications in blueberries (Tasnim et al., 2022). However, how nanocellulose interacts alone or with foliar fertilizers in facilitating nutrient uptake in peaches, is not well known.*   
+
+*For these reasons, we investigated whether the application of inorganic  foliar fertilizers, alone or in combination with nanocellulose during fruirt growth, enhances nutrient uptake; and, if the nutrient profiles change over time at preharvest. This will help us to assess whether or not the implementation of foliar mineral nutrition in orchard management programs adds any value to detect nutritional imbalances.*   
+
 # Hypothesis and objectives  
-Describe here your hypothesis, followed by your objectives. Make sure your hypothesis are testable and bold, and objectives are clear.  
+Describe here your hypothesis, followed by your objectives. Make sure your hypothesis are testable and bold, and objectives are clear. 
+
+*Application of inorganic foliar mineral nutrition alone or in combination with CNF will increase nutrient levels in the leaves during preharvest, and nutrient levels will change over time.*  
+
+*The objectives were to assess the benefits of foliar mineral nutrition on nutrient levels in the leaves during preharvest leaf sap analysis, and to determine nutrient profile changes over time that might impact fruit quality at postharvest.*  
 
 # Material and Methods  
 Describe here your overall material and methods as it pertains to the analysis you will conduct, including study description, site/setup description, what equipment was used, etc. just like you would in a paper. Make sure to clearly explain what was measured and how.
+
+
+*The experiment was conducted on a ten-year-old orchard, trained in an open-vase system, planted at 6.1 m x 4.6 m (20 x 15 ft) at the University of Georgia Peach Research and Extension farm in Griffin, GA. The cultivar Julyprince grafted onto Guardian rootstock was established in a Cecil sandy loam soil. Except treatment 7 (T7), none of the experimental trees received soil or foliar fertilizer applications in 2023, the year prior to the experiment initiation. Pruning was done twice per crop season, spring and summer, and fruit thinning at 50 DAFB in 2024. For pest control, the recommendations of southeastern pest management and culture guide were followed. Water was managed based on the Peach Smart Irrigation App recommendations <https://smartirrigationapps.org/peach-app/>. Even though there was no crop harvest due to a late freeze in 2023, trees were irrigated from July to October; and in 2024 late May to mid-October. *  
+
+*Foliar applications were scheduled at two-week intervals on non-windy days with temperatures < 30 C to minimize burning or scorching on hot days when evaporation is high. We utilized DI water as solvent to avoid solution pH adjustments or potential incompatibility. In 2024, except T5 second spray, applications were at 36, 50, 67, 80, and 94 DAFB by following the average of the manufacturer's recommended dosage; except T5, which was reduced to half of the average recommended dose to minimize its viscosity. We ended applications four weeks before harvest. Each solution was mixed at 1000 rpm for 15 minutes and applied to the tree canopy using a spray gun with two nozzles connected to a CO2 pressurized sprayer, which gave a 35-40 psi. *  
+
+*Foliar applications were carried out three or four days prior to leaf sampling. Except after the second foliar application, 90 g of old and new leaf samples, including petioles, were collected between 8 am and 11 am at 40, 72, 86, and 100 days after full bloom (DAFB) for sap analysis. Fully developed and expanded young leaves are around the third leaf from the growing point, and old functional leaves are from the middle to the last leaf on the woody growth for the current year. Samples with no surface moisture were placed in air-free Ziplock bags and then in coolers with ice packs, transported to the lab, and sent overnight for analysis. Samples were collected on clear days and temperatures < 27 °C.  *   
 
 ## Study design  
 Clearly describe your study design here, including treatment design (which factors and levels, the hierarchy among them, etc.), and your experimental design (number of reps/blocks, how was randomization performed, etc.), as we talked about in class.  
@@ -528,7 +547,7 @@ aic_table %>%
 
 Select the best model for each response variable based on AIC values. 
 ```{r}
-#| tbl-cap: Best correlation structure based on the lowest Aic for each of the response variables. 
+#| tbl-cap: Best correlation structure based on the lowest AIC for each of the response variables. 
  
 best_model_table <- 
    aic_table %>%
