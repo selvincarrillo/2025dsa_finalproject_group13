@@ -313,7 +313,7 @@ sap_all_samples <-
 
 ```
 
-## 2) Exploratory data analyses (EDA)
+## Exploratory data analyses (EDA)
 
 Let's confirm that:     
 
@@ -331,9 +331,11 @@ We might consider to exclude nitrate, cobalt, molybdenum, nickel, and selenium f
 sap_all_samples %>% glimpse()
 ```
 
-Macronutrients, except potassium, were <0.05 ppm. 
+Macronutrients, except potassium, were <1000 ppm. 
 ```{r density plot macro}
 #| fig-cap: Density plots of macronutrients. 
+#| fig-width: 10
+#| fig-height: 8
 library(ggridges)
 
 sap_all_samples %>% 
@@ -356,6 +358,8 @@ sap_all_samples %>%
 Most micronutrients were < 25 ppm. 
 ```{r density plot micro}
 #| fig-cap: Density plots of micronutrients. 
+#| fig-width: 10
+#| fig-height: 8
 library(ggridges)
 
 sap_all_samples %>% 
@@ -379,7 +383,8 @@ sap_all_samples %>%
 Boxplots of Irrigation system within each block 
 ```{r}
 #| fig-cap: Macro- and micronutrients at different irrigation systems within each block.  
-
+#| fig-width: 10
+#| fig-height: 8
 sap_all_samples %>% 
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
@@ -398,7 +403,8 @@ sap_all_samples %>%
 Boxplots of foliar treatment within each irrigation system 
 ```{r}
 #| fig-cap: Macro- and micronutrients at different foliar treatments within each irrigation system. 
-
+#| fig-width: 10
+#| fig-height: 8
 sap_all_samples %>% 
    #pivot longer so I can plot
    pivot_longer(where(is.numeric)) %>% 
@@ -443,7 +449,8 @@ sap_all_samples %>%
   tab_style(style = cell_text(weight = "bold"), locations = cells_column_labels())
 ```
 
-## Statistical model fitting
+## Statistical model fitting  
+
 Let's remember that `lmer()` function does not allow to specify correlation structures while `lme()` allows to fit spatial and temporal correlation structures.  
 
 Because our data includes a time variable, it should be analyzed as a **split-split-plot RCBD repeated measures**.  
@@ -641,74 +648,6 @@ names(best_models) <- names(best_model_list)
 
 ```
 
-### Table of p-values
-```{r}
-#| tbl-cap: p-values of leaf sap analysis
-
-# Create a table of p-values
-pval_table <- 
-  best_models %>% 
-  discard(is.null) %>%  # remove NULL models first
-  map(~ .x %>% Anova(type = 3) %>% tidy()) %>% # get Anova output and tidy
-  map(~ .x %>% clean_names() %>% select(term, p_value)) %>% # clean names
-  bind_rows(.id = "response") %>% # make a big table
-  pivot_wider(names_from = response, values_from = p_value) %>% # reshape
-  filter(term != "(Intercept)")  # remove intercept
-
-
-
-# create table
-tbl <- pval_table %>%
-  gt() %>%
-  cols_label(term = "Factor") %>%
-  fmt_number(columns = everything(), decimals = 3) %>%
-  tab_header(title = "", subtitle = " ") %>%
-  tab_options(heading.align = "left",
-              table_body.hlines.width = px(0)) %>%
-  cols_label(
-    brix = "°Brix",
-    n_conv_eff = "N Conv\nEff",
-    nitrogen = "N",
-    ammonium = md("NH<sub>4</sub>"),
-    phosphorus = "P",
-    potassium = "K",
-    calcium = "Ca",
-    magnesium     = "Mg",
-    kca_ratio	 = "K/Ca",
-    sulfur = "S",
-    iron = "Fe",
-    manganese = "Mn",
-    boron = "B",
-    zinc = "Zn",
-    copper = "Cu",
-    sugars = "Sugars",
-    ec = "EC",
-    silica   = "Si",
-    chloride = "Cl",
-    sodium   = "Na",
-    ph = "pH") %>%
-  cols_move (columns = c(nitrogen, n_conv_eff, phosphorus, potassium, calcium, kca_ratio, magnesium, sulfur), after = ammonium) %>%
-  cols_move (columns = c(iron, copper, zinc, manganese, chloride, silica, sodium), after = boron) %>%
-  tab_style(style = cell_text(weight = "bold"),
-             locations = cells_column_labels()) %>%
-  tab_style(style = cell_fill(color = "lightgray"),
-            locations = cells_body(rows = seq(1, nrow(pval_table), 2))) %>%
-  tab_source_note("P ≤ 0.05 indicates significance. Significant values are in bold.") 
-
-# highlight in bold the significant p-values (p ≤ 0.05) in the table.
-tbl <- reduce(
-  names(pval_table)[-1],  # all p-value columns (skip 'term')
-  .init = tbl,
-  .f = ~ tab_style(
-    .x,
-    style = cell_text(weight = "bold"),
-    locations = cells_body(columns = .y, rows = .data[[.y]] < 0.05)
-  )
-)
-
-tbl
-```
-
 ### Model assumption plots 
 ```{r}
 library(broom.mixed)  # for augment()
@@ -796,7 +735,75 @@ names(diagnostic_plots) <- names(best_models_clean)
 #   )
 # }
 ```
-For the model assumptions (homoscedasticity, normality, and no outliers), we may have problems with N conversion efficiency, sodium, silica, pH, and boron. 
+For the model assumptions (homoscedasticity, normality, and no outliers), we may have problems with N conversion efficiency, sodium, silica, pH, and boron.  
+
+### Table of p-values
+```{r}
+#| tbl-cap: p-values of leaf sap analysis
+
+# Create a table of p-values
+pval_table <- 
+  best_models %>% 
+  discard(is.null) %>%  # remove NULL models first
+  map(~ .x %>% Anova(type = 3) %>% tidy()) %>% # get Anova output and tidy
+  map(~ .x %>% clean_names() %>% select(term, p_value)) %>% # clean names
+  bind_rows(.id = "response") %>% # make a big table
+  pivot_wider(names_from = response, values_from = p_value) %>% # reshape
+  filter(term != "(Intercept)")  # remove intercept
+
+
+
+# create table
+tbl <- pval_table %>%
+  gt() %>%
+  cols_label(term = "Factor") %>%
+  fmt_number(columns = everything(), decimals = 3) %>%
+  tab_header(title = "", subtitle = " ") %>%
+  tab_options(heading.align = "left",
+              table_body.hlines.width = px(0)) %>%
+  cols_label(
+    brix = "°Brix",
+    n_conv_eff = "N Conv\nEff",
+    nitrogen = "N",
+    ammonium = md("NH<sub>4</sub>"),
+    phosphorus = "P",
+    potassium = "K",
+    calcium = "Ca",
+    magnesium     = "Mg",
+    kca_ratio	 = "K/Ca",
+    sulfur = "S",
+    iron = "Fe",
+    manganese = "Mn",
+    boron = "B",
+    zinc = "Zn",
+    copper = "Cu",
+    sugars = "Sugars",
+    ec = "EC",
+    silica   = "Si",
+    chloride = "Cl",
+    sodium   = "Na",
+    ph = "pH") %>%
+  cols_move (columns = c(nitrogen, n_conv_eff, phosphorus, potassium, calcium, kca_ratio, magnesium, sulfur), after = ammonium) %>%
+  cols_move (columns = c(iron, copper, zinc, manganese, chloride, silica, sodium), after = boron) %>%
+  tab_style(style = cell_text(weight = "bold"),
+             locations = cells_column_labels()) %>%
+  tab_style(style = cell_fill(color = "lightgray"),
+            locations = cells_body(rows = seq(1, nrow(pval_table), 2))) %>%
+  tab_source_note("P ≤ 0.05 indicates significance. Significant values are in bold.") 
+
+# highlight in bold the significant p-values (p ≤ 0.05) in the table.
+tbl <- reduce(
+  names(pval_table)[-1],  # all p-value columns (skip 'term')
+  .init = tbl,
+  .f = ~ tab_style(
+    .x,
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = .y, rows = .data[[.y]] < 0.05)
+  )
+)
+
+tbl
+```
 
 
 ### Paiwise comparisons and plots  
@@ -806,9 +813,10 @@ We are interested in those interactions with foliar treatment and time, so we wi
 #### Foliar treatment, leaf age, and time interaction 
 
 Sodium 
-```{r}
+```{r Na}
 #| fig-cap: Na levels at 40, 72, 86, and 100 DAB for new and old leves. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-
+#| fig-width: 8
+#| fig-height: 6
 na <- 
    best_models$sodium %>% 
    #estimated marginal means (a.k.a. least-squares means) 
@@ -843,15 +851,18 @@ ggplot(mapping = aes(fill = time)) +
    facet_grid(.~new_old) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 T2 and T6, which have nanocellulose, may be causing sodium increase because there are higher values at 40 and 100 DAB. 
 
 
 Sugars 
-```{r}
+```{r Sugars}
 #| fig-cap: Sugars levels at 40, 72, 86, and 100 DAB for new and old leves. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-
+#| fig-width: 8
+#| fig-height: 6
 sug <- 
    best_models$sugars %>% 
    #estimated marginal means (a.k.a. least-squares means) 
@@ -886,16 +897,19 @@ ggplot(mapping = aes(fill = time)) +
    facet_grid(.~new_old) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Differences are present in the new leaves only for all time points. Foliar treatments T3, T4, T5 enhanced sugars in the new leaves compared with the soil-based fertilization at 86 and 100 DAB.
 
 #### Irrigation system, foliar treatment, and time interaction  
 
 Boron 
-```{r}
+```{r B}
 #| fig-cap: B levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-#| 
+#| fig-width: 8
+#| fig-height: 6
 #estimated marginal means (a.k.a. least-squares means) 
 b_sym_cld <- 
    best_models$boron %>% 
@@ -930,14 +944,17 @@ ggplot(mapping = aes(fill = time)) +
    facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.7))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Foliar treatments were different only at 40 DAB in the drip irrigation system; and the soil-based fertilization had higher levels compared to the rest of foliar treatments, except T1. B decreased sharply after 40 DAB in both irrigation systems, which indicates that plants were unable to move sugars, N, and P from source to sink tissues because B helps load those nutrients into the phloem.
 
-Copper 
-```{r}
+Copper  
+```{r Cu}
 #| fig-cap: Cu levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-
+#| fig-width: 8
+#| fig-height: 6
 cu <- 
    best_models$copper %>% 
    emmeans(~  foliar_trt | irr_system | time) %>% # compares new_old at each time point 
@@ -971,14 +988,17 @@ ggplot(mapping = aes(fill = time)) +
    facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Cu decreased until 86 DAB for both irrigation systems. T3 and T4 are different at 72m 86, and 100 DAB in the drip systems, and at 40 and 72 DAB, which may suggest that they are interacting with other elements.  
 
-Magnesium 
-```{r}
+Magnesium  
+```{r Mg}
 #| fig-cap: Mg levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-
+#| fig-width: 8
+#| fig-height: 6  
 mg <- 
    best_models$magnesium %>% 
    emmeans(~  foliar_trt |irr_system | time) %>% # compares foliar_trt within irrigation at each time point 
@@ -1012,15 +1032,18 @@ ggplot(mapping = aes(fill = time)) +
    facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.6,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Mg was increasing in both irrigation systemsm, however, it decreased at 100 DAB. The soil based fertilization (T7), was at a low level compared to the foliar treatments, which can indicate that foliar treatments helped with higher Mg levels.  
 
 
-Manganese 
-```{r}
+Manganese   
+```{r Mn}
 #| fig-cap: Mn levels at 40, 72, 86, and 100 DAB for drip and micro-sprinkler irrigation systems. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#| 
+#| fig-width: 8
+#| fig-height: 6
 mn <- 
    best_models$manganese %>% 
    emmeans(~  foliar_trt |irr_system | time) %>% # compares foliar_trt within irrigation at each time point 
@@ -1054,16 +1077,19 @@ ggplot(mapping = aes(fill = time)) +
    facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.6,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Main differences among treatments were at 40 DAB. The control treatment (T1) was highly variable at all time points.  
 
 #### Foliar treatment and time interaction   
 
-Ammonium 
-```{r}
+Ammonium  
+```{r NH4}
 #| fig-cap: NH4 levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.
-#| 
+#| fig-width: 8
+#| fig-height: 6
 nh4 <- 
    best_models$ammonium  %>% 
    emmeans(~  foliar_trt | time ) %>% # compares foliar_trt at each time point
@@ -1097,14 +1123,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 NH4 were higher higher in the soil-based fertilization at 40, 72, and 100 DAB. This may be due to the application of fertilizer to the soil twice per season.  
 
-Calcium 
-```{r}
+Calcium   
+```{r Ca}
 #| fig-cap: Ca levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.
-#| 
+#| fig-width: 8
+#| fig-height: 6
 ca <- 
    best_models$calcium %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1138,15 +1167,18 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.7,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Nanocellulose increased Calcium (T5) and Potassium Silicate (T6) uptake at 40 DAB. Calcium on the soil-based fertilization (T7) was lower at 40 and 100 DAFB.  
 
 
-Electrical conductivity 
-```{r}
+Electrical conductivity   
+```{r EC}
 #| fig-cap: EC levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.
-#| 
+#| fig-width: 8
+#| fig-height: 6
 ec <- 
    best_models$ec %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1180,14 +1212,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.7,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 EC may have been related to moisture changes in the soil at 72 DAB.   
 
-Iron
-```{r}
+Iron   
+```{r Fe}
 #| fig-cap: Fe levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-#| 
+#| fig-width: 8
+#| fig-height: 6
 fe <- 
    best_models$iron %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1221,14 +1256,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.7,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Iron increased until after 86 DAB.   
 
-Potassium/Calcium ratio
-```{r}
+Potassium/Calcium ratio   
+```{r kca ratio}
 #| fig-cap: K/Ca ratio levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05. 
-#| 
+#| fig-width: 8
+#| fig-height: 6
 kca <- 
    best_models$kca_ratio %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1262,14 +1300,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Likely there was an imbalace between K and Ca in the leaves. The ratio increased at 86 DAB, maybe because the fruits were big enouth that there were not able to uptake more Ca.  
 
-Nitrogen 
-```{r}
+Nitrogen  
+```{r N}
 #| fig-cap: K/Ca ratio levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#| 
+#| fig-width: 8
+#| fig-height: 6
 n <- 
    best_models$nitrogen %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1303,14 +1344,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 N was fairly constant at all time points. AT 72 DAB, the soil based-fertilizer treatment (T7) had higher levels.  
 
-pH
-```{r}
+pH   
+```{r pH}
 #| fig-cap: pH levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#| 
+#| fig-width: 8
+#| fig-height: 6
 ph <- 
    best_models$ph %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1344,14 +1388,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.6,0.2))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 pH was decreasing over time. The soil based-fertilizer is different at 72 DAB.  
 
-Phosphorus
-```{r}
+Phosphorus   
+```{r P}
 #| fig-cap: P levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#| 
+#| fig-width: 8
+#| fig-height: 6
 p <- 
    best_models$phosphorus %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1385,14 +1432,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Higher P levels at 40 DAB in the soil based-fertilizer. Which make sense since there was an application in the spring of 10-10-10 for this treatment (T7).  
 
-Potassium 
-```{r}
+Potassium    
+```{r K}
 #| fig-cap: K levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#| 
+#| fig-width: 8
+#| fig-height: 6
 k <- 
    best_models$potassium %>% 
    emmeans(~  foliar_trt | time) %>% # compares foliar_trt at each time point 
@@ -1426,17 +1476,20 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.4,0.9))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 K levels increased until 86 DAB, then decreased because it could have moved to the fruit, e.g., sink tissue.  
 
-Silica 
-```{r}
+Silica   
+```{r Si}
 #| fig-cap: Si levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#|  
+#| fig-width: 8
+#| fig-height: 6 
 si <- 
    best_models$silica %>% 
-   emmeans(~  foliar_trt|irr_system| time) %>% #compares foliar_trt within each irrigation 
+   emmeans(~  foliar_trt| time) %>% #compares foliar_trt within each irrigation 
    cld(alpha = 0.05, reversed = TRUE, adjust = "none", Letters=letters) %>% 
    as.data.frame() %>% 
    mutate(letter = trimws(.group)) 
@@ -1464,18 +1517,20 @@ ggplot(mapping = aes(fill = time)) +
         y = "Si (ppm)", 
         fill = "Foliar") +
    scale_fill_viridis_d() + 
-   facet_grid(.~irr_system) + 
+   #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.7,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Sharp decline of Si after 40 DAB. The plant may have used it to deal with biotic or abiotic stresses.  Silica levels are in fact greater in T4 and T6, but not significantly different.  
 
-Sulfur 
-```{r}
+Sulfur   
+```{r S}
 #| fig-cap: S levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
-#| fig-width: 6
-#| fig-height: 4
+#| fig-width: 8
+#| fig-height: 6
 s <- 
    best_models$sulfur %>% 
    emmeans(~  foliar_trt | time) %>% # 
@@ -1509,13 +1564,17 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.6,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 We have an outlier for S at 100 DAB. S levels were fairly constant at 86 DAB.  
 
-Zn
-```{r}
+Zn   
+```{r Zn}
 #| fig-cap: Zn levels at 40, 72, 86, and 100 DAB. Different letters mean significant differences among foliar treatments at alpha <0.05.  
+#| fig-width: 8
+#| fig-height: 6
 #| 
 zn <- 
    best_models$zinc %>% 
@@ -1550,13 +1609,15 @@ ggplot(mapping = aes(fill = time)) +
    #facet_grid(.~irr_system) + 
    theme(panel.grid.major = element_blank(), 
          panel.grid.minor = element_blank(), 
-         legend.position = c(0.6,0.8))
+         legend.position = "top",
+         legend.direction = "horizontal")+
+  guides(fill = guide_legend(nrow = 1))
 ```
 Zn was decreasing over time, which may have been caused by the high levels of P. The could be some antagonism between P and Zn.
 
-In general, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, e.g., pre- and post-harvest, however, it is not always the case. 
+In general, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, e.g., pre- and post-harvest, however, it is not always the case.  
 
-## 4) Suficiency ranges for leaf sap  
+## Suficiency ranges for leaf sap  
 
 Sufficiency ranges in ppm for micro- and micro-nutrients. 
 ```{r}
@@ -1588,10 +1649,14 @@ reference_ranges <- tribble(
 
 Summarise data for each time point for all variables. 
 ```{r}
+#| tbl-cap: Sufficiency ranges, average values for macro and micro-nutrients at 40, 72, 86, and 100 days after blooming (DAB), and statuses of the mineral nutrients during fruit growth.  
+#| 
 sap_all_samples %>% 
+  # summarise by time 
    group_by(time_num) %>% 
    summarise(across(where(is.numeric), \(x)  mean(x, na.rm= TRUE))) %>% 
    ungroup() %>% 
+  # put variables in a different order 
    relocate(nitrogen, phosphorus, potassium, calcium, magnesium, sulfur,
             iron, manganese, boron, copper, zinc, chloride, aluminum,
             sodium, silica, sugars, brix, ph, ec, n_conv_eff, ammonium, kca_ratio, .after = time_num ) %>%
@@ -1600,6 +1665,7 @@ sap_all_samples %>%
    pivot_wider(names_from = time_num, values_from = value) %>% 
   mutate(response = name, .keep = "unused") %>%
   relocate(response, .before = DAF_40) %>%
+  # change to abbreviated nutrient names 
     mutate(response = case_when(
     response == "brix"~ "°Brix (%)",
     response == "n_conv_eff" ~ "N Conv\nEff",
@@ -1629,27 +1695,32 @@ sap_all_samples %>%
     response == "selenium" ~ "Se",
     response == "cobalt" ~ "Co",
     TRUE ~ response)) %>%
+  # join the reference ranges 
   right_join(reference_ranges, by = "response") %>%
   pivot_longer(cols = starts_with("DAF_"), names_to = "time", values_to = "value") %>%
-mutate(Status = case_when(
+  # assign excess, good, or optimal levels
+  mutate(Status = case_when(
   is.na(Min) | is.na(value) ~ NA_character_,
   value < Min ~ "Deficient",
   value > Max ~ "Excess",
   value >= Min & value <= Max ~ "Good")) %>%
-pivot_wider(names_from = time, values_from = value) %>%  # Status will still be one column
+  # transform to wide format 
+  pivot_wider(names_from = time, values_from = value) %>%  # Status will still be one column
   relocate(Status, .after = DAF_100 ) %>% 
+  # format table 
    gt() %>% 
    fmt_number(columns = c(DAF_40, DAF_72, DAF_86, DAF_100), decimals = 1) %>% 
   fmt_number(columns = c(Min, Max), decimals = 0) %>% 
    tab_spanner (label = "Days After Blooming (DAB)", columns = c(DAF_40, DAF_72, DAF_86, DAF_100)) %>%
   tab_spanner (label = "Expected\nRange", columns = c(Min, Max)) %>%
   tab_spanner (label = "(ppm)", columns = c(Min , Max, DAF_40, DAF_72, DAF_86, DAF_100)) %>%
-  
+  # change column names 
   cols_label(DAF_40 = "40", 
               DAF_72 = "72", 
               DAF_86 = "86", 
               DAF_100 = "100") %>%
   cols_label(response = "Response \n variable") %>% 
+  # format Status column 
   tab_style(style = cell_text(weight = "bold"),
              locations = cells_column_labels()) %>% 
     tab_style(
@@ -1666,9 +1737,9 @@ pivot_wider(names_from = time, values_from = value) %>%  # Status will still be 
   )
   
 ```
+Sap analysis revealed that most micronutrients are below the minimum levels during fruit growth. 
 
-
-## 4) Takeaway 
+## Takeaway 
 Fruit quality can only be improved before harvest or preharvest, so looking at the nutritional status in the leaves during fruit growth has been overlookeked in the standard guidelines of nutrient management guidelines for the Southeast. Overall, all nutrient changed over time, which reflects the critical phenological stages during fruit growth. Ca, S, Fe, Mn, B, and Cu, Sugars, and pH were below the minimum levels at all time points. N remained within the expected range, while P and K were above the maximum levels. These results suggest that the plants had imbalances in macro- and micro nutrients during fruit growth that will likely compromise fruit quality. 
 
 Although, we would expect the T7 to have higher levels of macronutrients since it has received soil-based fertilization twice a year, e.g., pre- and post-harvest,  it is not always the case. Foliar applications showed increased levels for some mineral nutrients at specific time points, but not all. 
